@@ -1,0 +1,106 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HaxTrace</title>
+    <link rel="icon" href="haxtrace.png">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <div class="section">
+                <h3>Map Settings</h3>
+                <div class="form-group">
+                    <label>Map Name</label>
+                    <input type="text" id="mapName" value="New Stadium">
+                </div>
+                <div class="form-group">
+                    <label>Background Color</label>
+                    <input type="color" id="bgColor" value="#718C5A">
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>Background Image</h3>
+                <div class="file-input">
+                    <input type="file" id="bgImage" accept="image/*">
+                </div>
+                <div class="background-controls">
+                    <div class="opacity-control">
+                        <label>Opacity</label>
+                        <input type="range" id="bgOpacity" min="0" max="1" step="0.1" value="0.5">
+                    </div>
+                </div>
+                <div class="scale-control">
+                    <label>Scale</label>
+                    <div class="input-group">
+                        <input type="number" id="bgScaleValue" min="0.1" max="5" step="0.1" value="1.0">
+                        <input type="range" id="bgScaleSlider" min="0.1" max="5" step="0.1" value="1.0">
+                    </div>
+                    <button onclick="resetBgScale()" class="secondary">Reset</button>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>Vertex</h3>
+                <div class="vertex-list" id="vertexList"></div>
+            </div>
+
+            <div class="section">
+                <h3>Segments</h3>
+                <div class="segment-list" id="segmentList"></div>
+                <div class="form-group">
+                    <label>Segment Color</label>
+                    <input type="color" id="segmentColor" value="#000000">
+                </div>
+                <div class="form-group">
+                    <label>Curve (0 = straight)</label>
+                    <input type="number" id="segmentCurve" value="0" step="0.1">
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>Import/Export</h3>
+                <button onclick="exportMap()">Export HBS</button>
+                <button onclick="importMap()" class="secondary">Import HBS</button>
+                <input type="file" id="importFile" accept=".hbs,.json" style="display: none;">
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="toolbar">
+                <div class="tool-group">
+                    <button class="tool-button active" onclick="setTool('vertex')" id="vertexTool">Add Vertex</button>
+                    <button class="tool-button" onclick="setTool('segment')" id="segmentTool">Add Segment</button>
+                    <button class="tool-button" onclick="setTool('pan')" id="panTool">Pan</button>
+                </div>
+                <div class="zoom-controls">
+                    <button onclick="zoomIn()">+</button>
+                    <button onclick="zoomOut()">-</button>
+                    <span class="zoom-level" id="zoomLevel">100%</span>
+                    <button onclick="resetZoom()" class="secondary">Reset</button>
+                </div>
+            </div>
+            <div class="canvas-container">
+                <canvas id="canvas" width="800" height="600"></canvas>
+                <div id="curveEditorPanel" class="floating-panel" style="display: none;">
+                    <div class="panel-header">Curve</div>
+                    <div class="panel-content">
+                        <div class="form-group" id="curveEditorControls">
+                            <label for="curveValue">Curve Properties</label>
+                            <div class="input-group">
+                                <input type="number" id="curveValue" step="0.1">
+                                <input type="range" id="curveSlider" min="-340" max="340" step="0.1" value="0">
+                            </div>
+                        </div>
+                        <div id="multipleSegmentsMessage" style="display: none;">Multiple segments selected</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="js/main.js"></script>
+</body>
+</html>
