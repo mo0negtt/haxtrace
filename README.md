@@ -69,13 +69,6 @@
 - **Keyboard Mastery:** Atajos profesionales para un flujo de trabajo sin mouse.
 
 </td>
-    <td width="50%" valign="top">
-
-### 📂 Management & UI
-- **Professional Dashboard:** Gestión de proyectos recientes y logs de versión.
-- **Haxball JSON Export:** Compatible al 100% con el formato oficial de Haxball.
-
-</td>
   </tr>
 </table>
 
