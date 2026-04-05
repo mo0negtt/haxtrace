@@ -90,7 +90,9 @@
 <table>
   <thead>
     <tr>
-      <th align="center">Proyecto</th>
+      <th align="center">Otros proyecto</th>
+      <td><strong>HaxNode</strong></td>
+      <td>Editor de scripts/bot automatico.</td>
       <th align="center">Inspiración / Uso</th>
     </tr>
   </thead>
