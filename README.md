@@ -32,7 +32,8 @@
 
 <h1><a id="screenshots"></a>Interface Preview</h1>
 
-<img src="https://tu-repo.com/screenshot_dashboard.png" alt="HaxTrace Dashboard" width="45%" />
+<img width="1354" height="684" alt="HaxTrace" src="https://github.com/user-attachments/assets/2c9f9605-b655-4ab5-9579-cd231a5791dd" width="50%"/>
+
 <img src="https://tu-repo.com/screenshot_editor.png" alt="HaxTrace Editor" width="45%" />
 
 </div>
