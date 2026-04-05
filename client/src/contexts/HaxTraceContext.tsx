@@ -2,7 +2,7 @@ import { createContext, useContext, useState, useCallback, ReactNode } from 'rea
 import { HaxMap, Vertex, Segment, BackgroundImage } from '@shared/schema';
 import { chordLength, radiusToAngle, sagittaToAngle } from '@/lib/circularArc';
 
-export type Tool = 'vertex' | 'segment' | 'pan';
+export type Tool = 'vertex' | 'segment' | 'pan' | 'polyline' | 'ortho' | 'measure' | 'pencil' | 'spiral';
 
 interface HaxTraceContextType {
   map: HaxMap;
@@ -13,14 +13,28 @@ interface HaxTraceContextType {
   selectedSegments: number[];
   hoveredVertex: number | null;
   setHoveredVertex: (index: number | null) => void;
+  polylineAnchorVertex: number | null;
+  setPolylineAnchorVertex: (index: number | null) => void;
   segmentColor: string;
   setSegmentColor: (color: string) => void;
+  segmentWeight: number;
+  setSegmentWeight: (w: number) => void;
+  segmentStyle: 'solid' | 'dashed';
+  setSegmentStyle: (s: 'solid' | 'dashed') => void;
+  segmentOpacity: number;
+  setSegmentOpacity: (o: number) => void;
+  colorHistory: string[];
+  pushColorHistory: (color: string) => void;
   curveType: 'angle' | 'radius' | 'sagitta';
   setCurveType: (type: 'angle' | 'radius' | 'sagitta') => void;
   curveValue: number;
   setCurveValue: (value: number) => void;
+  previewMode: boolean;
+  togglePreviewMode: () => void;
   gridVisible: boolean;
   toggleGrid: () => void;
+  snapToGrid: boolean;
+  toggleSnapToGrid: () => void;
   gridSize: number;
   setGridSize: (size: number) => void;
   zoom: number;
@@ -28,7 +42,10 @@ interface HaxTraceContextType {
   mousePos: { x: number; y: number };
   setMousePos: (pos: { x: number; y: number }) => void;
   addVertex: (x: number, y: number) => void;
+  addVertexWithMirror: (x: number, y: number, axis: 'x' | 'y') => void;
   addSegment: (v0: number, v1: number, color?: string) => void;
+  addPolylineVertex: (x: number, y: number, anchorIndex: number | null, color?: string) => number;
+  addPolylineVertexWithMirror: (x: number, y: number, anchorIndex: number | null, mirrorAnchorIndex: number | null, axis: 'x' | 'y', color?: string) => [number, number];
   selectVertex: (index: number, multiSelect?: boolean) => void;
   selectAllVertices: () => void;
   clearVertexSelection: () => void;
@@ -43,6 +60,17 @@ interface HaxTraceContextType {
   duplicateSegment: (index: number) => void;
   duplicateSelectedVertices: () => void;
   duplicateSelectedSegments: () => void;
+  mirrorSelectedVertices: (axis: 'x' | 'y') => void;
+  mirrorSelectedSegments: (axis: 'x' | 'y') => void;
+  smartGuides: boolean;
+  toggleSmartGuides: () => void;
+  vertexSnap: boolean;
+  toggleVertexSnap: () => void;
+  mirrorMode: boolean;
+  toggleMirrorMode: () => void;
+  mirrorAxis: 'x' | 'y';
+  setMirrorAxis: (axis: 'x' | 'y') => void;
+  updateSelectedSegmentsCurve: (type: 'angle' | 'radius' | 'sagitta', value: number) => void;
   setBackgroundImage: (dataURL: string) => void;
   updateBackgroundImage: (bgImage: BackgroundImage) => void;
   removeBackgroundImage: () => void;
@@ -91,6 +119,11 @@ const defaultMap: HaxMap = {
 
 export const HaxTraceProvider = ({ children }: HaxTraceProviderProps) => {
   const [map, setMapInternal] = useState<HaxMap>(() => {
+    const pending = localStorage.getItem('haxtrace_pending_load');
+    if (pending) {
+      localStorage.removeItem('haxtrace_pending_load');
+      try { return JSON.parse(pending); } catch {}
+    }
     const saved = localStorage.getItem('haxtraceMap');
     if (saved) {
       try {
@@ -104,6 +137,10 @@ export const HaxTraceProvider = ({ children }: HaxTraceProviderProps) => {
   });
 
   const initialHistory = (() => {
+    const pending = localStorage.getItem('haxtrace_pending_load');
+    if (pending) {
+      try { return [JSON.parse(pending)]; } catch {}
+    }
     const saved = localStorage.getItem('haxtraceMap');
     if (saved) {
       try {
@@ -125,13 +162,34 @@ export const HaxTraceProvider = ({ children }: HaxTraceProviderProps) => {
     localStorage.setItem('haxtraceMap', JSON.stringify(newMap));
   }, [historyIndex]);
 
-  const [currentTool, setCurrentTool] = useState<Tool>('vertex');
+  const [currentTool, setCurrentToolInternal] = useState<Tool>('polyline');
   const [selectedVertices, setSelectedVertices] = useState<number[]>([]);
   const [selectedSegments, setSelectedSegments] = useState<number[]>([]);
   const [hoveredVertex, setHoveredVertex] = useState<number | null>(null);
+  const [polylineAnchorVertex, setPolylineAnchorVertex] = useState<number | null>(null);
+
+  const setCurrentTool = useCallback((tool: Tool) => {
+    setCurrentToolInternal(tool);
+    if (tool !== 'polyline') {
+      setPolylineAnchorVertex(null);
+    }
+  }, []);
   const [segmentColor, setSegmentColorInternal] = useState<string>('ffffff');
+  const [segmentWeight, setSegmentWeight] = useState<number>(3);
+  const [segmentStyle, setSegmentStyle] = useState<'solid' | 'dashed'>('solid');
+  const [segmentOpacity, setSegmentOpacity] = useState<number>(1);
+  const [colorHistory, setColorHistory] = useState<string[]>([]);
+  const pushColorHistory = useCallback((color: string) => {
+    setColorHistory(prev => {
+      const filtered = prev.filter(c => c.toLowerCase() !== color.toLowerCase());
+      return [color, ...filtered].slice(0, 5);
+    });
+  }, []);
   const [curveType, setCurveType] = useState<'angle' | 'radius' | 'sagitta'>('angle');
   const [curveValue, setCurveValue] = useState<number>(0);
+  const [previewMode, setPreviewMode] = useState(false);
+  const togglePreviewMode = useCallback(() => setPreviewMode(v => !v), []);
+
   const [gridVisible, setGridVisible] = useState<boolean>(() => {
     const saved = localStorage.getItem('gridVisible');
     return saved ? JSON.parse(saved) : true;
@@ -173,6 +231,54 @@ export const HaxTraceProvider = ({ children }: HaxTraceProviderProps) => {
       vertexes: [...map.vertexes, { x, y }],
     };
     saveHistory(newMap);
+  }, [map, saveHistory]);
+
+  const addVertexWithMirror = useCallback((x: number, y: number, axis: 'x' | 'y') => {
+    const mx = axis === 'x' ? -x : x;
+    const my = axis === 'x' ? y : -y;
+    const newMap = {
+      ...map,
+      vertexes: [...map.vertexes, { x, y }, { x: mx, y: my }],
+    };
+    saveHistory(newMap);
+  }, [map, saveHistory]);
+
+  const addPolylineVertex = useCallback((x: number, y: number, anchorIndex: number | null, color?: string): number => {
+    const newVertexIndex = map.vertexes.length;
+    const newVertexes = [...map.vertexes, { x, y }];
+    let newSegments = [...map.segments];
+    if (anchorIndex !== null && anchorIndex !== newVertexIndex) {
+      const segment: Segment = {
+        v0: anchorIndex,
+        v1: newVertexIndex,
+        ...(color && { color }),
+      };
+      newSegments = [...newSegments, segment];
+    }
+    const newMap = { ...map, vertexes: newVertexes, segments: newSegments };
+    saveHistory(newMap);
+    return newVertexIndex;
+  }, [map, saveHistory]);
+
+  const addPolylineVertexWithMirror = useCallback((
+    x: number, y: number,
+    anchorIndex: number | null, mirrorAnchorIndex: number | null,
+    axis: 'x' | 'y', color?: string
+  ): [number, number] => {
+    const mx = axis === 'x' ? -x : x;
+    const my = axis === 'x' ? y : -y;
+    const newVertexIndex = map.vertexes.length;
+    const mirrorVertexIndex = map.vertexes.length + 1;
+    const newVertexes = [...map.vertexes, { x, y }, { x: mx, y: my }];
+    let newSegments = [...map.segments];
+    if (anchorIndex !== null && anchorIndex !== newVertexIndex) {
+      newSegments = [...newSegments, { v0: anchorIndex, v1: newVertexIndex, ...(color && { color }) }];
+    }
+    if (mirrorAnchorIndex !== null && mirrorAnchorIndex !== mirrorVertexIndex) {
+      newSegments = [...newSegments, { v0: mirrorAnchorIndex, v1: mirrorVertexIndex, ...(color && { color }) }];
+    }
+    saveHistory({ ...map, vertexes: newVertexes, segments: newSegments });
+    return [newVertexIndex, mirrorVertexIndex];
   }, [map, saveHistory]);
 
   const addSegment = useCallback((v0: number, v1: number, color?: string) => {
@@ -380,6 +486,60 @@ export const HaxTraceProvider = ({ children }: HaxTraceProviderProps) => {
     setSelectedSegments(newSelection);
   }, [map, selectedSegments, saveHistory]);
 
+  const mirrorSelectedVertices = useCallback((axis: 'x' | 'y') => {
+    if (selectedVertices.length === 0) return;
+    const newVertexes = [...map.vertexes];
+    const xs = selectedVertices.map(i => map.vertexes[i].x);
+    const ys = selectedVertices.map(i => map.vertexes[i].y);
+    const cx = (Math.min(...xs) + Math.max(...xs)) / 2;
+    const cy = (Math.min(...ys) + Math.max(...ys)) / 2;
+    selectedVertices.forEach(idx => {
+      const v = map.vertexes[idx];
+      newVertexes[idx] = axis === 'x'
+        ? { ...v, x: 2 * cx - v.x }
+        : { ...v, y: 2 * cy - v.y };
+    });
+    saveHistory({ ...map, vertexes: newVertexes });
+  }, [map, selectedVertices, saveHistory]);
+
+  const [smartGuides, setSmartGuides] = useState(false);
+  const toggleSmartGuides = useCallback(() => setSmartGuides(v => !v), []);
+  const [vertexSnap, setVertexSnap] = useState(false);
+  const toggleVertexSnap = useCallback(() => setVertexSnap(v => !v), []);
+  const [mirrorMode, setMirrorMode] = useState(false);
+  const toggleMirrorMode = useCallback(() => setMirrorMode(v => !v), []);
+  const [mirrorAxis, setMirrorAxis] = useState<'x' | 'y'>('x');
+
+  const updateSelectedSegmentsCurve = useCallback((type: 'angle' | 'radius' | 'sagitta', value: number) => {
+    if (selectedSegments.length === 0) return;
+    const newSegments = [...map.segments];
+    selectedSegments.forEach(idx => {
+      newSegments[idx] = { ...newSegments[idx], curveData: { type, value } };
+    });
+    saveHistory({ ...map, segments: newSegments });
+  }, [map, selectedSegments, saveHistory]);
+
+  const mirrorSelectedSegments = useCallback((axis: 'x' | 'y') => {
+    if (selectedSegments.length === 0) return;
+    const involvedIdx = new Set<number>();
+    selectedSegments.forEach(si => {
+      involvedIdx.add(map.segments[si].v0);
+      involvedIdx.add(map.segments[si].v1);
+    });
+    const xs = [...involvedIdx].map(i => map.vertexes[i].x);
+    const ys = [...involvedIdx].map(i => map.vertexes[i].y);
+    const cx = (Math.min(...xs) + Math.max(...xs)) / 2;
+    const cy = (Math.min(...ys) + Math.max(...ys)) / 2;
+    const newVertexes = [...map.vertexes];
+    involvedIdx.forEach(idx => {
+      const v = map.vertexes[idx];
+      newVertexes[idx] = axis === 'x'
+        ? { ...v, x: 2 * cx - v.x }
+        : { ...v, y: 2 * cy - v.y };
+    });
+    saveHistory({ ...map, vertexes: newVertexes });
+  }, [map, selectedSegments, saveHistory]);
+
   const setBackgroundImage = useCallback((dataURL: string) => {
     const newMap = {
       ...map,
@@ -554,6 +714,11 @@ export const HaxTraceProvider = ({ children }: HaxTraceProviderProps) => {
     });
   }, []);
 
+  const [snapToGrid, setSnapToGrid] = useState<boolean>(false);
+  const toggleSnapToGrid = useCallback(() => {
+    setSnapToGrid(prev => !prev);
+  }, []);
+
   const handleSetGridSize = useCallback((size: number) => {
     setGridSize(size);
     localStorage.setItem('gridSize', String(size));
@@ -572,14 +737,28 @@ export const HaxTraceProvider = ({ children }: HaxTraceProviderProps) => {
     selectedSegments,
     hoveredVertex,
     setHoveredVertex,
+    polylineAnchorVertex,
+    setPolylineAnchorVertex,
     segmentColor,
     setSegmentColor,
+    segmentWeight,
+    setSegmentWeight,
+    segmentStyle,
+    setSegmentStyle,
+    segmentOpacity,
+    setSegmentOpacity,
+    colorHistory,
+    pushColorHistory,
     curveType,
     setCurveType,
     curveValue,
     setCurveValue,
+    previewMode,
+    togglePreviewMode,
     gridVisible,
     toggleGrid,
+    snapToGrid,
+    toggleSnapToGrid,
     gridSize,
     setGridSize: handleSetGridSize,
     zoom,
@@ -587,7 +766,10 @@ export const HaxTraceProvider = ({ children }: HaxTraceProviderProps) => {
     mousePos,
     setMousePos,
     addVertex,
+    addVertexWithMirror,
     addSegment,
+    addPolylineVertex,
+    addPolylineVertexWithMirror,
     selectVertex,
     selectAllVertices,
     clearVertexSelection,
@@ -602,6 +784,17 @@ export const HaxTraceProvider = ({ children }: HaxTraceProviderProps) => {
     duplicateSegment,
     duplicateSelectedVertices,
     duplicateSelectedSegments,
+    mirrorSelectedVertices,
+    mirrorSelectedSegments,
+    smartGuides,
+    toggleSmartGuides,
+    vertexSnap,
+    toggleVertexSnap,
+    mirrorMode,
+    toggleMirrorMode,
+    mirrorAxis,
+    setMirrorAxis,
+    updateSelectedSegmentsCurve,
     setBackgroundImage,
     updateBackgroundImage,
     removeBackgroundImage,
