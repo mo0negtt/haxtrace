@@ -50,7 +50,7 @@
 <table>
   <tr>
 </td>
-    <td width="100%" valign="top">
+    <td width="50%" valign="top">
 
 ### 🎯 Precision & Assistance
 - **Smart Guides:** Alineación dinámica (X/Y) con resalte en cian.
