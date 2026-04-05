@@ -1,6 +1,7 @@
 <div align="center">
 
-<img src="https://tu-repo.com/logo-haxtrace.png" alt="HaxTrace Icon" width="200" />
+<img src="<img width="169" height="169" alt="favicon" src="https://github.com/user-attachments/assets/02d4d972-37f5-459b-872c-969df4883344" />
+" alt="HaxTrace Icon" width="200" />
 
 # HaxTrace
 
@@ -171,6 +172,7 @@
 <br/>
 
 **Hecho con ❤️ por [mo0negtt](https://github.com/mo0negtt)**
-**This project stands with Palestine 🇵🇸**
+
+**🇵🇸**
 
 </div>
