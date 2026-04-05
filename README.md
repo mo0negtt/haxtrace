@@ -1,7 +1,6 @@
 <div align="center">
 
-<img src="<img width="169" height="169" alt="favicon" src="https://github.com/user-attachments/assets/02d4d972-37f5-459b-872c-969df4883344" />
-" alt="HaxTrace Icon" width="200" />
+<img width="169" height="169" alt="favicon" src="https://github.com/user-attachments/assets/05b752c9-0da8-4d83-b0b1-15a7f5eb8a80" />
 
 # HaxTrace
 
