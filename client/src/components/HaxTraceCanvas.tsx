@@ -7,8 +7,16 @@ import {
   ContextMenuItem,
   ContextMenuTrigger,
   ContextMenuSeparator,
+  ContextMenuSub,
+  ContextMenuSubTrigger,
+  ContextMenuSubContent,
 } from '@/components/ui/context-menu';
-import { Copy, Trash2, Move } from 'lucide-react';
+import { Copy, Trash2, FlipHorizontal2, FlipVertical2 } from 'lucide-react';
+
+type ContextTarget =
+  | { type: 'vertex'; index: number }
+  | { type: 'segment'; index: number }
+  | null;
 
 export const HaxTraceCanvas = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -24,6 +32,10 @@ export const HaxTraceCanvas = () => {
     hoveredVertex,
     setHoveredVertex,
     addVertex,
+    addVertexWithMirror,
+    addSegment,
+    addPolylineVertex,
+    addPolylineVertexWithMirror,
     selectVertex,
     selectSegment,
     selectAllVertices,
@@ -32,6 +44,7 @@ export const HaxTraceCanvas = () => {
     updateVertex,
     gridVisible,
     gridSize,
+    snapToGrid,
     zoom,
     setZoom,
     setMousePos,
@@ -42,14 +55,34 @@ export const HaxTraceCanvas = () => {
     duplicateSelectedSegments,
     deleteSelectedSegments,
     deleteSelectedVertices,
+    polylineAnchorVertex,
+    setPolylineAnchorVertex,
+    segmentColor,
+    previewMode,
+    mirrorSelectedVertices,
+    mirrorSelectedSegments,
+    smartGuides,
+    vertexSnap,
+    mirrorMode,
+    mirrorAxis,
   } = useHaxTrace();
 
+  const [smartGuideLines, setSmartGuideLines] = useState<{
+    xs: number[];
+    ys: number[];
+  }>({ xs: [], ys: [] });
+
+  const renderRef = useRef<() => void>(() => {});
   const [isDraggingVertex, setIsDraggingVertex] = useState<number | null>(null);
   const [dragStartPositions, setDragStartPositions] = useState<Map<number, { x: number; y: number }>>(new Map());
   const [dragOffset, setDragOffset] = useState<{ x: number; y: number } | null>(null);
-  const [contextMenuTarget, setContextMenuTarget] = useState<{ type: 'vertex' | 'segment'; index: number } | null>(null);
+  const [contextMenuTarget, setContextMenuTarget] = useState<ContextTarget>(null);
   const [marqueeStart, setMarqueeStart] = useState<{ x: number; y: number } | null>(null);
   const [marqueeCurrent, setMarqueeCurrent] = useState<{ x: number; y: number } | null>(null);
+  const [polylineMouseScreen, setPolylineMouseScreen] = useState<{ x: number; y: number } | null>(null);
+  const [mirrorPolylineAnchorVertex, setMirrorPolylineAnchorVertex] = useState<number | null>(null);
+  const [measureStart, setMeasureStart] = useState<{ screen: { x: number; y: number }; world: { x: number; y: number } } | null>(null);
+  const [measureEnd, setMeasureEnd] = useState<{ screen: { x: number; y: number }; world: { x: number; y: number } } | null>(null);
 
   useEffect(() => {
     if (!canvasRef.current) return;
@@ -63,14 +96,20 @@ export const HaxTraceCanvas = () => {
       });
     }
 
+    const ro = new ResizeObserver(() => {
+      renderer.updateCanvasSize();
+      renderRef.current();
+    });
+    ro.observe(canvasRef.current);
+
     const handleResize = () => {
       renderer.updateCanvasSize();
-      render();
+      renderRef.current();
     };
-
     window.addEventListener('resize', handleResize);
 
     return () => {
+      ro.disconnect();
       window.removeEventListener('resize', handleResize);
       if (animationFrameRef.current) {
         cancelAnimationFrame(animationFrameRef.current);
@@ -99,6 +138,64 @@ export const HaxTraceCanvas = () => {
     render();
   }, [zoom]);
 
+  // Smart guides: find vertices that align with the cursor within threshold (world units)
+  const computeSmartGuides = useCallback((
+    worldX: number, worldY: number,
+    vertices: typeof map.vertexes,
+    excludeIndices: number[] = [],
+    threshold = 10
+  ) => {
+    const xs: number[] = [];
+    const ys: number[] = [];
+    let snapX: number | null = null;
+    let snapY: number | null = null;
+    let bestXDist = threshold;
+    let bestYDist = threshold;
+    vertices.forEach((v, i) => {
+      if (excludeIndices.includes(i)) return;
+      const dx = Math.abs(v.x - worldX);
+      const dy = Math.abs(v.y - worldY);
+      if (dx < bestXDist) { bestXDist = dx; snapX = v.x; }
+      if (dy < bestYDist) { bestYDist = dy; snapY = v.y; }
+      if (dx < threshold && !xs.includes(v.x)) xs.push(v.x);
+      if (dy < threshold && !ys.includes(v.y)) ys.push(v.y);
+    });
+    return { xs, ys, snapX, snapY };
+  }, [map.vertexes]);
+
+  // Vertex snap: find the nearest vertex within screen-space threshold
+  const findNearestVertex = useCallback((
+    screenX: number, screenY: number,
+    excludeIndices: number[] = [],
+    thresholdPx = 14
+  ): { index: number; x: number; y: number } | null => {
+    const renderer = rendererRef.current;
+    if (!renderer) return null;
+    let best: { index: number; x: number; y: number } | null = null;
+    let bestDist = thresholdPx;
+    map.vertexes.forEach((v, i) => {
+      if (excludeIndices.includes(i)) return;
+      const s = renderer.worldToScreen(v.x, v.y);
+      const d = Math.sqrt((s.x - screenX) ** 2 + (s.y - screenY) ** 2);
+      if (d < bestDist) { bestDist = d; best = { index: i, x: v.x, y: v.y }; }
+    });
+    return best;
+  }, [map.vertexes]);
+
+  // Ortho 8-direction snap
+  const snapOrtho8 = useCallback((rawX: number, rawY: number, anchor: { x: number; y: number }) => {
+    const dx = rawX - anchor.x;
+    const dy = rawY - anchor.y;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+    if (dist < 0.001) return { x: anchor.x, y: anchor.y };
+    const angle = Math.atan2(dy, dx);
+    const snappedAngle = Math.round(angle / (Math.PI / 4)) * (Math.PI / 4);
+    return {
+      x: Math.round(anchor.x + Math.cos(snappedAngle) * dist),
+      y: Math.round(anchor.y + Math.sin(snappedAngle) * dist),
+    };
+  }, []);
+
   const render = useCallback(() => {
     const renderer = rendererRef.current;
     if (!renderer) return;
@@ -118,23 +215,185 @@ export const HaxTraceCanvas = () => {
       renderer.drawSegment(segment, map.vertexes, isSelected);
     });
 
-    map.vertexes.forEach((vertex, index) => {
-      const isSelected = selectedVertices.includes(index);
-      const isHovered = hoveredVertex === index;
-      renderer.drawVertex(vertex, isSelected, isHovered);
-    });
+    if (!previewMode) {
+      map.vertexes.forEach((vertex, index) => {
+        const isSelected = selectedVertices.includes(index);
+        const isHovered = hoveredVertex === index;
+        renderer.drawVertex(vertex, isSelected, isHovered);
+      });
+    }
 
     if (marqueeStart && marqueeCurrent && canvasRef.current) {
       const ctx = renderer['ctx'];
-      ctx.strokeStyle = '#3b82f6';
-      ctx.fillStyle = 'rgba(59, 130, 246, 0.1)';
-      ctx.lineWidth = 2;
+      ctx.strokeStyle = '#00d4ff';
+      ctx.fillStyle = 'rgba(0, 212, 255, 0.07)';
+      ctx.lineWidth = 1.5;
+      ctx.setLineDash([5, 4]);
       const width = marqueeCurrent.x - marqueeStart.x;
       const height = marqueeCurrent.y - marqueeStart.y;
       ctx.fillRect(marqueeStart.x, marqueeStart.y, width, height);
       ctx.strokeRect(marqueeStart.x, marqueeStart.y, width, height);
+      ctx.setLineDash([]);
     }
-  }, [map, selectedVertices, selectedSegments, hoveredVertex, gridVisible, gridSize, marqueeStart, marqueeCurrent]);
+
+    // Smart guide lines
+    if (smartGuides && (smartGuideLines.xs.length > 0 || smartGuideLines.ys.length > 0)) {
+      const ctx = renderer['ctx'];
+      const W = canvasRef.current!.width;
+      const H = canvasRef.current!.height;
+      ctx.save();
+      ctx.strokeStyle = '#00d4ff';
+      ctx.lineWidth = 1;
+      ctx.setLineDash([6, 5]);
+      ctx.globalAlpha = 0.65;
+      // Vertical guides (same X)
+      smartGuideLines.xs.forEach(wx => {
+        const s = renderer.worldToScreen(wx, 0);
+        ctx.beginPath();
+        ctx.moveTo(s.x, 0);
+        ctx.lineTo(s.x, H);
+        ctx.stroke();
+      });
+      // Horizontal guides (same Y)
+      smartGuideLines.ys.forEach(wy => {
+        const s = renderer.worldToScreen(0, wy);
+        ctx.beginPath();
+        ctx.moveTo(0, s.y);
+        ctx.lineTo(W, s.y);
+        ctx.stroke();
+      });
+      ctx.restore();
+    }
+
+    // Ruler overlay with tick marks
+    if (currentTool === 'measure' && measureStart && measureEnd) {
+      const ctx = renderer['ctx'];
+      const { screen: s0, world: w0 } = measureStart;
+      const { screen: s1, world: w1 } = measureEnd;
+      const dist = Math.sqrt((w1.x - w0.x) ** 2 + (w1.y - w0.y) ** 2);
+      const distRounded = Math.round(dist);
+      const screenDist = Math.sqrt((s1.x - s0.x) ** 2 + (s1.y - s0.y) ** 2);
+      const angleDeg = Math.atan2(s1.y - s0.y, s1.x - s0.x) * (180 / Math.PI);
+      const angleRad = Math.atan2(s1.y - s0.y, s1.x - s0.x);
+      const px = Math.cos(angleRad), py = Math.sin(angleRad);
+      const nx = -py, ny = px;
+
+      ctx.save();
+
+      // Shadow line for depth
+      ctx.setLineDash([]);
+      ctx.strokeStyle = 'rgba(0,0,0,0.4)';
+      ctx.lineWidth = 6;
+      ctx.beginPath();
+      ctx.moveTo(s0.x + 1, s0.y + 1);
+      ctx.lineTo(s1.x + 1, s1.y + 1);
+      ctx.stroke();
+
+      // Ruler body (filled rectangle rotated)
+      ctx.translate(s0.x, s0.y);
+      ctx.rotate(angleRad);
+      const rulerH = 10;
+      const rulerW = screenDist;
+      ctx.fillStyle = 'rgba(0,212,255,0.12)';
+      ctx.strokeStyle = 'rgba(0,212,255,0.7)';
+      ctx.lineWidth = 1.2;
+      ctx.beginPath();
+      ctx.roundRect(0, -rulerH / 2, rulerW, rulerH, 2);
+      ctx.fill();
+      ctx.stroke();
+
+      // Tick marks
+      const worldPerPixel = dist / (screenDist || 1);
+      const tickSpacingWorld = (() => {
+        const candidates = [1, 5, 10, 25, 50, 100, 200, 500];
+        return candidates.find(c => c / worldPerPixel >= 8) ?? 1;
+      })();
+      const tickSpacingPx = tickSpacingWorld / worldPerPixel;
+      const numTicks = Math.floor(screenDist / tickSpacingPx);
+      ctx.strokeStyle = 'rgba(0,212,255,0.85)';
+      ctx.lineWidth = 1;
+      for (let i = 0; i <= numTicks; i++) {
+        const tx = i * tickSpacingPx;
+        if (tx > screenDist) break;
+        const isMajor = i % 5 === 0;
+        const tickLen = isMajor ? rulerH * 0.8 : rulerH * 0.45;
+        ctx.beginPath();
+        ctx.moveTo(tx, -tickLen / 2);
+        ctx.lineTo(tx, tickLen / 2);
+        ctx.stroke();
+      }
+
+      // End caps
+      ctx.strokeStyle = '#00d4ff';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(0, -rulerH / 2 - 2);
+      ctx.lineTo(0, rulerH / 2 + 2);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(screenDist, -rulerH / 2 - 2);
+      ctx.lineTo(screenDist, rulerH / 2 + 2);
+      ctx.stroke();
+
+      ctx.restore();
+
+      // Endpoint dots
+      ctx.save();
+      [s0, s1].forEach(p => {
+        ctx.beginPath(); ctx.arc(p.x, p.y, 4, 0, Math.PI * 2);
+        ctx.fillStyle = '#00d4ff'; ctx.fill();
+        ctx.strokeStyle = 'rgba(0,0,0,0.5)'; ctx.lineWidth = 1; ctx.stroke();
+      });
+      ctx.restore();
+
+      // Distance label
+      const mx = (s0.x + s1.x) / 2 + nx * 18;
+      const my = (s0.y + s1.y) / 2 + ny * 18;
+      const label = `${distRounded}px`;
+      ctx.save();
+      ctx.font = 'bold 12px Inter, system-ui, sans-serif';
+      const tw = ctx.measureText(label).width;
+      ctx.fillStyle = 'rgba(0,0,0,0.75)';
+      ctx.beginPath();
+      ctx.roundRect(mx - tw / 2 - 8, my - 11, tw + 16, 22, 6);
+      ctx.fill();
+      ctx.strokeStyle = 'rgba(0,212,255,0.4)';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+      ctx.fillStyle = '#00d4ff';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(label, mx, my);
+      // Angle
+      const aLabel = `${Math.round(angleDeg < 0 ? angleDeg + 360 : angleDeg)}°`;
+      ctx.font = '10px Inter, system-ui, sans-serif';
+      ctx.fillStyle = 'rgba(0,212,255,0.6)';
+      ctx.fillText(aLabel, mx, my + 15);
+      ctx.restore();
+    }
+
+    // Polyline preview
+    if ((currentTool === 'polyline' || currentTool === 'ortho') && polylineAnchorVertex !== null && polylineMouseScreen) {
+      const anchorVertex = map.vertexes[polylineAnchorVertex];
+      if (anchorVertex) {
+        const ctx = renderer['ctx'];
+        const anchorScreen = renderer.worldToScreen(anchorVertex.x, anchorVertex.y);
+        ctx.save();
+        ctx.setLineDash([6, 4]);
+        ctx.strokeStyle = 'rgba(14, 165, 233, 0.85)';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(anchorScreen.x, anchorScreen.y);
+        ctx.lineTo(polylineMouseScreen.x, polylineMouseScreen.y);
+        ctx.stroke();
+        ctx.restore();
+      }
+    }
+  }, [map, selectedVertices, selectedSegments, hoveredVertex, gridVisible, gridSize, marqueeStart, marqueeCurrent, currentTool, polylineAnchorVertex, polylineMouseScreen, measureStart, measureEnd, previewMode, smartGuides, smartGuideLines]);
+
+  useEffect(() => {
+    renderRef.current = render;
+  });
 
   useEffect(() => {
     render();
@@ -152,6 +411,18 @@ export const HaxTraceCanvas = () => {
     const isCtrlPressed = e.ctrlKey || e.metaKey;
     
     if (e.button === 2) {
+      // Polyline / Ortho: right-click = cut the thread (end the chain, no context menu)
+      if (currentTool === 'polyline' || currentTool === 'ortho') {
+        if (polylineAnchorVertex !== null) {
+          setPolylineAnchorVertex(null);
+          setMirrorPolylineAnchorVertex(null);
+          setPolylineMouseScreen(null);
+          renderRef.current();
+        }
+        setContextMenuTarget(null);
+        return;
+      }
+
       if (vertexIndex !== null) {
         setContextMenuTarget({ type: 'vertex', index: vertexIndex });
         if (selectedVertices.includes(vertexIndex) && selectedVertices.length > 1) {
@@ -196,6 +467,9 @@ export const HaxTraceCanvas = () => {
         return;
       }
 
+      const snapCoord = (v: number) =>
+        snapToGrid && gridSize > 0 ? Math.round(v / gridSize) * gridSize : Math.round(v);
+
       if (currentTool === 'vertex') {
         if (vertexIndex !== null) {
           const multiSelect = e.shiftKey || isCtrlPressed;
@@ -217,7 +491,12 @@ export const HaxTraceCanvas = () => {
         
         if (!e.shiftKey && !isCtrlPressed) {
           const world = renderer.screenToWorld(x, y);
-          addVertex(Math.round(world.x), Math.round(world.y));
+          const sx = snapCoord(world.x), sy = snapCoord(world.y);
+          if (mirrorMode) {
+            addVertexWithMirror(sx, sy, mirrorAxis);
+          } else {
+            addVertex(sx, sy);
+          }
           clearVertexSelection();
         } else {
           setMarqueeStart({ x, y });
@@ -238,8 +517,52 @@ export const HaxTraceCanvas = () => {
           clearSegmentSelection();
         }
       }
+
+      if (currentTool === 'measure') {
+        const world = renderer.screenToWorld(x, y);
+        setMeasureStart({ screen: { x, y }, world: { x: world.x, y: world.y } });
+        setMeasureEnd({ screen: { x, y }, world: { x: world.x, y: world.y } });
+        return;
+      }
+
+      if (currentTool === 'polyline' || currentTool === 'ortho') {
+        const world = renderer.screenToWorld(x, y);
+        let snappedX = snapCoord(world.x);
+        let snappedY = snapCoord(world.y);
+
+        // Ortho 8-direction snap
+        if (currentTool === 'ortho' && polylineAnchorVertex !== null) {
+          const anchor = map.vertexes[polylineAnchorVertex];
+          if (anchor) {
+            const snapped = snapOrtho8(snappedX, snappedY, anchor);
+            snappedX = snapped.x;
+            snappedY = snapped.y;
+          }
+        }
+
+        if (vertexIndex !== null) {
+          if (polylineAnchorVertex === null) {
+            setPolylineAnchorVertex(vertexIndex);
+            setMirrorPolylineAnchorVertex(null);
+          } else if (polylineAnchorVertex !== vertexIndex) {
+            addSegment(polylineAnchorVertex, vertexIndex, segmentColor);
+            setPolylineAnchorVertex(vertexIndex);
+            setMirrorPolylineAnchorVertex(null);
+          }
+        } else {
+          if (mirrorMode) {
+            const [newIndex, mirrorIndex] = addPolylineVertexWithMirror(snappedX, snappedY, polylineAnchorVertex, mirrorPolylineAnchorVertex, mirrorAxis, segmentColor);
+            setPolylineAnchorVertex(newIndex);
+            setMirrorPolylineAnchorVertex(mirrorIndex);
+          } else {
+            const newIndex = addPolylineVertex(snappedX, snappedY, polylineAnchorVertex, segmentColor);
+            setPolylineAnchorVertex(newIndex);
+          }
+        }
+        return;
+      }
     }
-  }, [currentTool, map, selectedVertices, addVertex, selectVertex, selectSegment, clearSegmentSelection, clearVertexSelection]);
+  }, [currentTool, map, selectedVertices, addVertex, addVertexWithMirror, addSegment, addPolylineVertex, addPolylineVertexWithMirror, selectVertex, selectSegment, clearSegmentSelection, clearVertexSelection, polylineAnchorVertex, setPolylineAnchorVertex, mirrorPolylineAnchorVertex, segmentColor, snapOrtho8, mirrorMode, mirrorAxis]);
 
   const handleMouseMove = useCallback((e: React.MouseEvent<HTMLCanvasElement>) => {
     const renderer = rendererRef.current;
@@ -252,21 +575,99 @@ export const HaxTraceCanvas = () => {
     const world = renderer.screenToWorld(x, y);
     setMousePos({ x: Math.round(world.x), y: Math.round(world.y) });
 
+    if (currentTool === 'measure' && measureStart) {
+      setMeasureEnd({ screen: { x, y }, world: { x: world.x, y: world.y } });
+      render();
+      return;
+    }
+
+    if (currentTool === 'polyline' || currentTool === 'ortho') {
+      let polyScreenX = x, polyScreenY = y;
+      let resolvedWorldX = Math.round(world.x);
+      let resolvedWorldY = Math.round(world.y);
+
+      // Ortho snap
+      if (currentTool === 'ortho' && polylineAnchorVertex !== null) {
+        const anchor = map.vertexes[polylineAnchorVertex];
+        if (anchor) {
+          const snapped = snapOrtho8(resolvedWorldX, resolvedWorldY, anchor);
+          resolvedWorldX = snapped.x;
+          resolvedWorldY = snapped.y;
+        }
+      }
+
+      // Vertex snap (polyline: prefer snapping to existing vertices)
+      if (vertexSnap) {
+        const near = findNearestVertex(x, y, polylineAnchorVertex !== null ? [polylineAnchorVertex] : []);
+        if (near) { resolvedWorldX = near.x; resolvedWorldY = near.y; }
+      }
+
+      // Smart guides snap (polyline)
+      if (smartGuides) {
+        const excludes = polylineAnchorVertex !== null ? [polylineAnchorVertex] : [];
+        const guides = computeSmartGuides(resolvedWorldX, resolvedWorldY, map.vertexes, excludes);
+        if (guides.snapX !== null) resolvedWorldX = guides.snapX;
+        if (guides.snapY !== null) resolvedWorldY = guides.snapY;
+        setSmartGuideLines({ xs: guides.xs, ys: guides.ys });
+      } else {
+        setSmartGuideLines({ xs: [], ys: [] });
+      }
+
+      const snappedScreen = renderer.worldToScreen(resolvedWorldX, resolvedWorldY);
+      polyScreenX = snappedScreen.x;
+      polyScreenY = snappedScreen.y;
+      setPolylineMouseScreen({ x: polyScreenX, y: polyScreenY });
+    } else if (!isDraggingVertex) {
+      setSmartGuideLines({ xs: [], ys: [] });
+    }
+
     if (marqueeStart) {
       setMarqueeCurrent({ x, y });
       return;
     }
 
     if (isDraggingVertex !== null) {
+      let wx = world.x;
+      let wy = world.y;
+
       if (dragStartPositions.size > 0 && dragOffset) {
-        const deltaX = world.x - dragOffset.x;
-        const deltaY = world.y - dragOffset.y;
-        
-        dragStartPositions.forEach((startPos, idx) => {
-          updateVertex(idx, Math.round(startPos.x + deltaX), Math.round(startPos.y + deltaY));
-        });
+        const deltaX = wx - dragOffset.x;
+        const deltaY = wy - dragOffset.y;
+
+        // Smart guides when dragging
+        if (smartGuides) {
+          const excludes = Array.from(dragStartPositions.keys());
+          const firstKey = excludes[0];
+          const firstStart = dragStartPositions.get(firstKey)!;
+          const projectedX = Math.round(firstStart.x + deltaX);
+          const projectedY = Math.round(firstStart.y + deltaY);
+          const guides = computeSmartGuides(projectedX, projectedY, map.vertexes, excludes);
+          setSmartGuideLines({ xs: guides.xs, ys: guides.ys });
+          const snapDx = guides.snapX !== null ? guides.snapX - projectedX : 0;
+          const snapDy = guides.snapY !== null ? guides.snapY - projectedY : 0;
+          dragStartPositions.forEach((startPos, idx) => {
+            updateVertex(idx, Math.round(startPos.x + deltaX + snapDx), Math.round(startPos.y + deltaY + snapDy));
+          });
+        } else {
+          dragStartPositions.forEach((startPos, idx) => {
+            updateVertex(idx, Math.round(startPos.x + deltaX), Math.round(startPos.y + deltaY));
+          });
+        }
       } else {
-        updateVertex(isDraggingVertex, Math.round(world.x), Math.round(world.y));
+        // Single vertex drag
+        if (vertexSnap) {
+          const near = findNearestVertex(x, y, [isDraggingVertex]);
+          if (near) { wx = near.x; wy = near.y; }
+        }
+        if (smartGuides) {
+          const guides = computeSmartGuides(Math.round(wx), Math.round(wy), map.vertexes, [isDraggingVertex]);
+          setSmartGuideLines({ xs: guides.xs, ys: guides.ys });
+          const snapX = guides.snapX ?? Math.round(wx);
+          const snapY = guides.snapY ?? Math.round(wy);
+          updateVertex(isDraggingVertex, snapX, snapY);
+        } else {
+          updateVertex(isDraggingVertex, Math.round(wx), Math.round(wy));
+        }
       }
       render();
       return;
@@ -282,35 +683,43 @@ export const HaxTraceCanvas = () => {
     if (vertexIndex !== hoveredVertex) {
       setHoveredVertex(vertexIndex);
     }
-  }, [isDraggingVertex, dragStartPositions, dragOffset, map, hoveredVertex, setHoveredVertex, updateVertex, render, marqueeStart, setMousePos]);
+  }, [isDraggingVertex, dragStartPositions, dragOffset, map, hoveredVertex, setHoveredVertex, updateVertex, render, marqueeStart, setMousePos, currentTool, polylineAnchorVertex, measureStart, snapOrtho8, smartGuides, vertexSnap, computeSmartGuides, findNearestVertex]);
 
   const handleMouseUp = useCallback(() => {
     const renderer = rendererRef.current;
     if (!renderer) return;
+
+    setSmartGuideLines({ xs: [], ys: [] });
 
     if (marqueeStart && marqueeCurrent) {
       const minX = Math.min(marqueeStart.x, marqueeCurrent.x);
       const maxX = Math.max(marqueeStart.x, marqueeCurrent.x);
       const minY = Math.min(marqueeStart.y, marqueeCurrent.y);
       const maxY = Math.max(marqueeStart.y, marqueeCurrent.y);
-      
+
       const worldMin = renderer.screenToWorld(minX, minY);
       const worldMax = renderer.screenToWorld(maxX, maxY);
-      
-      const verticesInBox: number[] = [];
+
+      // Select vertices inside box
       map.vertexes.forEach((vertex, index) => {
         if (vertex.x >= worldMin.x && vertex.x <= worldMax.x &&
             vertex.y >= worldMin.y && vertex.y <= worldMax.y) {
-          if (!selectedVertices.includes(index)) {
-            verticesInBox.push(index);
-          }
+          selectVertex(index, true);
         }
       });
-      
-      if (verticesInBox.length > 0) {
-        verticesInBox.forEach(index => selectVertex(index, true));
-      }
-      
+
+      // Select segments whose both endpoints are inside box
+      map.segments.forEach((seg, index) => {
+        const v0 = map.vertexes[seg.v0];
+        const v1 = map.vertexes[seg.v1];
+        if (!v0 || !v1) return;
+        const v0in = v0.x >= worldMin.x && v0.x <= worldMax.x && v0.y >= worldMin.y && v0.y <= worldMax.y;
+        const v1in = v1.x >= worldMin.x && v1.x <= worldMax.x && v1.y >= worldMin.y && v1.y <= worldMax.y;
+        if (v0in && v1in) {
+          selectSegment(index, true);
+        }
+      });
+
       setMarqueeStart(null);
       setMarqueeCurrent(null);
       return;
@@ -320,11 +729,26 @@ export const HaxTraceCanvas = () => {
     setDragStartPositions(new Map());
     setDragOffset(null);
     renderer.endPan();
-  }, [marqueeStart, marqueeCurrent, map.vertexes, selectedVertices, selectVertex]);
+  }, [marqueeStart, marqueeCurrent, map.vertexes, map.segments, selectedVertices, selectVertex, selectSegment]);
 
   const handleContextMenu = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
   }, []);
+
+  // Suppress the native (and Radix) context menu entirely when polyline/ortho is active
+  // by intercepting in the capture phase before Radix's listener fires.
+  useEffect(() => {
+    const el = canvasRef.current;
+    if (!el) return;
+    const suppress = (e: MouseEvent) => {
+      if (currentTool === 'polyline' || currentTool === 'ortho') {
+        e.preventDefault();
+        e.stopImmediatePropagation();
+      }
+    };
+    el.addEventListener('contextmenu', suppress, { capture: true });
+    return () => el.removeEventListener('contextmenu', suppress, { capture: true });
+  }, [currentTool]);
 
   const handleWheel = useCallback((e: React.WheelEvent) => {
     e.preventDefault();
@@ -372,6 +796,23 @@ export const HaxTraceCanvas = () => {
       } else if (e.key === 'p' || e.key === 'P' || e.key === '1') {
         e.preventDefault();
         setCurrentTool('pan');
+      } else if (e.key === 'l' || e.key === 'L' || e.key === '4') {
+        e.preventDefault();
+        setCurrentTool('polyline');
+      } else if (e.key === 'o' || e.key === 'O') {
+        e.preventDefault();
+        setCurrentTool('ortho');
+      } else if (e.key === 'm' || e.key === 'M') {
+        e.preventDefault();
+        setCurrentTool('measure');
+        setMeasureStart(null); setMeasureEnd(null);
+      } else if (e.key === 'Escape') {
+        e.preventDefault();
+        setPolylineAnchorVertex(null);
+        setMirrorPolylineAnchorVertex(null);
+        setPolylineMouseScreen(null);
+        setMeasureStart(null); setMeasureEnd(null);
+        renderRef.current();
       } else if ((e.ctrlKey || e.metaKey) && e.key === 'z' && !e.shiftKey) {
         e.preventDefault();
       } else if ((e.ctrlKey || e.metaKey) && (e.key === 'y' || (e.key === 'z' && e.shiftKey))) {
@@ -381,7 +822,7 @@ export const HaxTraceCanvas = () => {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [selectAllVertices, selectedVertices, selectedSegments, duplicateSelectedVertices, duplicateSelectedSegments, deleteSelectedVertices, deleteSelectedSegments, setCurrentTool]);
+  }, [selectAllVertices, selectedVertices, selectedSegments, duplicateSelectedVertices, duplicateSelectedSegments, deleteSelectedVertices, deleteSelectedSegments, setCurrentTool, setPolylineAnchorVertex]);
 
   return (
     <ContextMenu>
@@ -400,6 +841,8 @@ export const HaxTraceCanvas = () => {
         />
       </ContextMenuTrigger>
       <ContextMenuContent data-testid="context-menu-canvas">
+
+        {/* Vertex context menu */}
         {contextMenuTarget?.type === 'vertex' && (
           <>
             <ContextMenuItem
@@ -412,6 +855,24 @@ export const HaxTraceCanvas = () => {
               <Copy className="w-4 h-4 mr-2" />
               Duplicate Vertex
             </ContextMenuItem>
+            {selectedVertices.length > 1 && (
+              <ContextMenuSub>
+                <ContextMenuSubTrigger>
+                  <FlipHorizontal2 className="w-4 h-4 mr-2" />
+                  Mirror Selection
+                </ContextMenuSubTrigger>
+                <ContextMenuSubContent>
+                  <ContextMenuItem onClick={() => { mirrorSelectedVertices('x'); setContextMenuTarget(null); }}>
+                    <FlipHorizontal2 className="w-4 h-4 mr-2" />
+                    Mirror Horizontal (X)
+                  </ContextMenuItem>
+                  <ContextMenuItem onClick={() => { mirrorSelectedVertices('y'); setContextMenuTarget(null); }}>
+                    <FlipVertical2 className="w-4 h-4 mr-2" />
+                    Mirror Vertical (Y)
+                  </ContextMenuItem>
+                </ContextMenuSubContent>
+              </ContextMenuSub>
+            )}
             <ContextMenuSeparator />
             <ContextMenuItem
               data-testid="context-menu-delete-vertex"
@@ -426,6 +887,8 @@ export const HaxTraceCanvas = () => {
             </ContextMenuItem>
           </>
         )}
+
+        {/* Segment context menu */}
         {contextMenuTarget?.type === 'segment' && (
           <>
             <ContextMenuItem
@@ -438,6 +901,24 @@ export const HaxTraceCanvas = () => {
               <Copy className="w-4 h-4 mr-2" />
               Duplicate Segment
             </ContextMenuItem>
+            {selectedSegments.length > 0 && (
+              <ContextMenuSub>
+                <ContextMenuSubTrigger>
+                  <FlipHorizontal2 className="w-4 h-4 mr-2" />
+                  Mirror Segments
+                </ContextMenuSubTrigger>
+                <ContextMenuSubContent>
+                  <ContextMenuItem onClick={() => { mirrorSelectedSegments('x'); setContextMenuTarget(null); }}>
+                    <FlipHorizontal2 className="w-4 h-4 mr-2" />
+                    Mirror Horizontal (X)
+                  </ContextMenuItem>
+                  <ContextMenuItem onClick={() => { mirrorSelectedSegments('y'); setContextMenuTarget(null); }}>
+                    <FlipVertical2 className="w-4 h-4 mr-2" />
+                    Mirror Vertical (Y)
+                  </ContextMenuItem>
+                </ContextMenuSubContent>
+              </ContextMenuSub>
+            )}
             <ContextMenuSeparator />
             <ContextMenuItem
               data-testid="context-menu-delete-segment"
@@ -455,7 +936,8 @@ export const HaxTraceCanvas = () => {
             </ContextMenuItem>
           </>
         )}
-        {!contextMenuTarget && (
+
+        {!contextMenuTarget && currentTool !== 'polyline' && currentTool !== 'ortho' && (
           <ContextMenuItem disabled>No selection</ContextMenuItem>
         )}
       </ContextMenuContent>
