@@ -28,7 +28,7 @@
 </div>
 
 > [!TIP]
-> **HaxTrace** está optimizado para flujos de trabajo de mapeo retro y profesional. Utiliza el **Snap-to-Grid** y las **Smart Guides** para lograr una geometría perfecta en tus estadios de Haxball.
+> **HaxTrace** está optimizado para flujos de trabajo de mapeo y profesional. Utiliza el **Snap-to-Grid** y las **Smart Guides** para lograr una geometría perfecta en tus mapas de Haxball.
 
 ---
 
@@ -38,8 +38,6 @@
 
 <img src="https://tu-repo.com/screenshot_dashboard.png" alt="HaxTrace Dashboard" width="45%" />
 <img src="https://tu-repo.com/screenshot_editor.png" alt="HaxTrace Editor" width="45%" />
-
-*Inspirado en la potencia de Affinity con la agilidad del mapeo moderno.*
 
 </div>
 
@@ -51,14 +49,6 @@
 
 <table>
   <tr>
-    <td width="50%" valign="top">
-
-### 🎨 Drawing & Vectorization
-- **Smart Polylines:** Segmentos continuos con interrupción por clic derecho/Esc.
-- **3-Point Arc Tool:** Creación de curvas circulares perfecta en segundos.
-- **Vertex Simplifier:** Optimiza tu mapa reduciendo vértices redundantes.
-- **Low Poly Mode:** Estética PSX/PS1 para texturas y elementos visuales.
-
 </td>
     <td width="50%" valign="top">
 
@@ -83,9 +73,7 @@
 
 ### 📂 Management & UI
 - **Professional Dashboard:** Gestión de proyectos recientes y logs de versión.
-- **Cherry Theme:** Interfaz Dark Premium con acentos Cian y Naranja.
 - **Haxball JSON Export:** Compatible al 100% con el formato oficial de Haxball.
-- **Prefab Library:** Guarda y carga estructuras comunes de la Comunidad Cherry.
 
 </td>
   </tr>
@@ -100,22 +88,7 @@
 <h1><a id="faq"></a>FAQ</h1>
 
 <h3>¿Es compatible con el editor antiguo?</h3>
-<p>Sí, HaxTrace puede importar archivos JSON de Haxball y optimizar su geometría automáticamente.</p>
-
-<h3>¿Funciona offline?</h3>
-<p>HaxTrace es una PWA; una vez cargada, puedes seguir mapeando incluso sin conexión a internet.</p>
-
-</div>
-
----
-
-<div align="center">
-
-<h1><a id="comunidad-cherry"></a>Comunidad Cherry</h1>
-
-<h3>El hogar de los Game Mappers. <a href="https://discord.gg/comunidadcherry">¡Únete a nuestro Discord para compartir tus prefabs!</a></h3>
-
-<h3>Gracias a todos los mappers que hacen de este proyecto la herramienta definitiva para la creación de estadios.</h3>
+<p>Sí, HaxTrace puede importar archivos JSON de Haxball (.hbs) y optimizar su geometría.</p>
 
 </div>
 
@@ -138,14 +111,6 @@
     <tr>
       <td><strong>HaxPuck</strong></td>
       <td>Base técnica original por AtnNn.</td>
-    </tr>
-    <tr>
-      <td><strong>Affinity Designer</strong></td>
-      <td>Inspiración para la UX del Dashboard y flujos de trabajo.</td>
-    </tr>
-    <tr>
-      <td><strong>Replit</strong></td>
-      <td>Entorno de desarrollo principal y despliegue rápido.</td>
     </tr>
   </tbody>
 </table>
