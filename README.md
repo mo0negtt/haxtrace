@@ -90,6 +90,6 @@
 
 **Hecho con ❤️ por [mo0negtt](https://github.com/mo0negtt)**
 
-**🇵🇸**
+**🇵🇸 🇪🇭**
 
 </div>
