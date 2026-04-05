@@ -4,6 +4,8 @@
 
 # HaxTrace
 
+### Vectoriza tus logos paraa Haxball
+
 <br/>
 
 <br/>
@@ -76,33 +78,6 @@
 
 <h3>¿Es compatible con el editor antiguo?</h3>
 <p>Sí, HaxTrace puede importar archivos JSON de Haxball (.hbs) y optimizar su geometría.</p>
-
-</div>
-
----
-
-<div align="center">
-
-<h1>Special Thanks</h1>
-
-<h3>HaxTrace se construye sobre hombros de gigantes del código abierto.</h3>
-
-<table>
-  <thead>
-    <tr>
-      <th align="center">Otros proyecto</th>
-      <td><strong>HaxNode</strong></td>
-      <td>Editor de scripts/bot automatico.</td>
-      <th align="center">Inspiración / Uso</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td><strong>HaxPuck</strong></td>
-      <td>Base técnica original por AtnNn.</td>
-    </tr>
-  </tbody>
-</table>
 
 </div>
 
