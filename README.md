@@ -4,11 +4,7 @@
 
 # HaxTrace
 
-### The Professional Game Mapper's Suite for Haxball & Beyond
-
 <br/>
-
-<a href="https://haxtrace.pages.dev/" target="_blank"><img src="https://img.shields.io/badge/LIVE_DEMO-00d4ff?style=for-the-badge&logo=googlechrome&logoColor=black" alt="HaxTrace Live" /></a>
 
 <br/>
 
@@ -17,12 +13,11 @@
 
 <br/>
 
-[![Discord](https://img.shields.io/badge/Discord-%235865F2.svg?style=for-the-badge&logo=discord&logoColor=white&labelColor=0d1117)](https://discord.gg/comunidadcherry)
 [![TikTok](https://img.shields.io/badge/TikTok-000000?style=for-the-badge&logo=tiktok&logoColor=white&labelColor=0d1117)](https://www.tiktok.com/@mo0negtt)
 
 <br/>
 
-[**Editor**](#editor-features) · [**Smart Guides**](#precision) · [**Community**](#comunidad-cherry) · [**FAQ**](#faq)
+[**Editor**](#editor-features) · [**Smart Guides**](#precision) · [**FAQ**](#faq)
 
 </div>
 
