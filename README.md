@@ -8,13 +8,12 @@
 
 <br/>
 
-<a href="https://haxtrace.app" target="_blank"><img src="https://img.shields.io/badge/LIVE_DEMO-00d4ff?style=for-the-badge&logo=googlechrome&logoColor=black" alt="HaxTrace Live" /></a>
+<a href="https://haxtrace.pages.dev/" target="_blank"><img src="https://img.shields.io/badge/LIVE_DEMO-00d4ff?style=for-the-badge&logo=googlechrome&logoColor=black" alt="HaxTrace Live" /></a>
 
 <br/>
 
 [![Latest release](https://img.shields.io/github/v/release/mo0negtt/HaxTrace?style=for-the-badge&labelColor=0d1117&color=00d4ff)](https://github.com/mo0negtt/HaxTrace/releases)
 [![License](https://img.shields.io/github/license/mo0negtt/HaxTrace?style=for-the-badge&labelColor=0d1117&color=f97316)](https://github.com/mo0negtt/HaxTrace/blob/main/LICENSE)
-[![Community](https://img.shields.io/badge/Comunidad-Cherry-%23ff4d6d?style=for-the-badge&labelColor=0d1117)](https://discord.gg/comunidadcherry)
 
 <br/>
 
