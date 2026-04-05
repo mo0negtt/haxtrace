@@ -36,6 +36,7 @@
 
 <img width="1351" height="685" alt="HaxTrace" src="https://github.com/user-attachments/assets/4419f30e-2434-40db-bae8-45607923f816" width="50%"/>
 
+<img width="1351" height="682" alt="HaxTrace" src="https://github.com/user-attachments/assets/bc1d3e84-ea18-4a74-aa87-a7d7240f7d15" width="50%"/>
 
 </div>
 
