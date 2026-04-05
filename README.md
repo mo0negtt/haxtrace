@@ -5,7 +5,6 @@
 # HaxTrace
 
 ### Vectoriza tus logos paraa Haxball
-
 <br/>
 
 <br/>
@@ -51,7 +50,7 @@
 </td>
     <td width="50%" valign="top">
 
-### 🎯 Precision & Assistance
+### Precision & Assistance
 - **Smart Guides:** Alineación dinámica (X/Y) con resalte en cian.
 - **Mirror Mode:** Simetría real en tiempo real (Vertical/Horizontal).
 - **Vertex Magnetic:** Atrae el cursor a puntos existentes para conexiones perfectas.
@@ -62,7 +61,7 @@
   <tr>
     <td width="50%" valign="top">
 
-### 🖱️ Advanced Interaction
+### Advanced Interaction
 - **Omni-Selection:** Selección múltiple universal con cuadro de selección (Marquee).
 - **Edit in Bulk:** Cambia propiedades (bouncing, color, vis) de varios segmentos a la vez.
 - **Keyboard Mastery:** Atajos profesionales para un flujo de trabajo sin mouse.
