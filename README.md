@@ -9,8 +9,7 @@
 
 <br/>
 
-[![Latest release](https://img.shields.io/github/v/release/mo0negtt/HaxTrace?style=for-the-badge&labelColor=0d1117&color=00d4ff)](https://github.com/mo0negtt/HaxTrace/releases)
-[![License](https://img.shields.io/github/license/mo0negtt/HaxTrace?style=for-the-badge&labelColor=0d1117&color=f97316)](https://github.com/mo0negtt/HaxTrace/blob/main/LICENSE)
+[![Version](https://img.shields.io/badge/version-2.6.0-00d4ff?style=for-the-badge&labelColor=0d1117)](https://github.com/mo0negtt/HaxTrace/releases)
 
 <br/>
 
@@ -29,7 +28,7 @@
 
 <div align="center">
 
-<h1><a id="screenshots"></a>Interface Preview</h1>
+<h1><a id="screenshots"></a>Interface</h1>
 
 <img width="1354" height="684" alt="HaxTrace" src="https://github.com/user-attachments/assets/2c9f9605-b655-4ab5-9579-cd231a5791dd" width="50%"/>
 
@@ -69,17 +68,6 @@
 </td>
   </tr>
 </table>
-
-</div>
-
----
-
-<div align="center">
-
-<h1><a id="faq"></a>FAQ</h1>
-
-<h3>¿Es compatible con el editor antiguo?</h3>
-<p>Sí, HaxTrace puede importar archivos JSON de Haxball (.hbs) y optimizar su geometría.</p>
 
 </div>
 
