@@ -4,7 +4,7 @@
 
 # HaxTrace
 
-### Vectoriza tus logos paraa Haxball
+### Vectoriza tus logos para Haxball
 
 <br/>
 
