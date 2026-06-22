@@ -2,231 +2,212 @@
 @tailwind components;
 @tailwind utilities;
 
-/* DARK MODE - Figma style */
+/* Material Design 3 - Light Theme */
 :root {
-  --button-outline: rgba(255,255,255, .10);
-  --badge-outline: rgba(255,255,255, .05);
+  /* MD3 State Layers */
+  --state-layer-hover: rgba(79, 195, 247, 0.08);
+  --state-layer-press: rgba(79, 195, 247, 0.12);
+  --state-layer-focus: rgba(79, 195, 247, 0.12);
 
-  /* Automatic computation of border around primary / danger buttons */
-  --opaque-button-border-intensity: 9; /* In terms of percentages */
+  /* MD3 Color Tokens - Light Theme */
+  --primary: 189 100% 67%;
+  --on-primary: 0 0% 100%;
+  --primary-container: 189 100% 87%;
+  --on-primary-container: 189 100% 15%;
 
-  /* Backgrounds applied on top of other backgrounds when hovered/active */
-  --elevate-1: rgba(255,255,255, .04);
-  --elevate-2: rgba(255,255,255, .09);
+  --secondary: 190 30% 50%;
+  --on-secondary: 0 0% 100%;
+  --secondary-container: 190 30% 90%;
+  --on-secondary-container: 190 30% 15%;
 
-  --background: 0 0% 100%;
+  --tertiary: 160 50% 55%;
+  --on-tertiary: 0 0% 100%;
+  --tertiary-container: 160 50% 88%;
+  --on-tertiary-container: 160 50% 15%;
 
-  --foreground: 0 0% 0%;
+  --error: 0 84% 60%;
+  --on-error: 0 0% 100%;
+  --error-container: 0 84% 90%;
+  --on-error-container: 0 84% 15%;
 
-  --border: 0 0% 96.47%;
+  --background: 188 6% 98%;
+  --on-background: 188 6% 10%;
 
-  --card: 0 0% 96.47%;
+  --surface: 188 6% 98%;
+  --on-surface: 188 6% 10%;
+  --surface-variant: 188 10% 92%;
+  --on-surface-variant: 188 6% 30%;
 
-  --card-foreground: 0 0% 0%;
+  --surface-container: 188 6% 95%;
+  --surface-container-low: 188 6% 97%;
+  --surface-container-high: 188 6% 93%;
+  --surface-container-highest: 188 6% 90%;
 
-  --card-border: 0 0% 18%;
+  --outline: 188 6% 45%;
+  --outline-variant: 188 6% 85%;
 
-  --sidebar: 180 6.6667% 97.0588%;
+  --shadow: 0 0% 0%;
+  --scrim: 0 0% 0%;
 
-  --sidebar-foreground: 210 25% 7.8431%;
-
-  --sidebar-border: 205.0000 25.0000% 90.5882%;
-
-  --sidebar-primary: 203.8863 88.2845% 53.1373%;
-
-  --sidebar-primary-foreground: 0 0% 100%;
-
-  --sidebar-accent: 211.5789 51.3514% 92.7451%;
-
-  --sidebar-accent-foreground: 203.8863 88.2845% 53.1373%;
-
-  --sidebar-ring: 202.8169 89.1213% 53.1373%;
-
-  --popover: 0 0% 100%;
-
-  --popover-foreground: 0 0% 0%;
-
-  --popover-border: 0 0% 24%;
-
-  --primary: 96 85.19% 73.53%;
-
-  --primary-foreground: 0 0% 0%;
-
-  --secondary: 0 0% 0%;
-
-  --secondary-foreground: 0 0% 100%;
-
-  --muted: 0 0% 96.08%;
-
-  --muted-foreground: 0 0% 52.94%;
-
-  --accent: 254.21 100% 92.55%;
-
-  --accent-foreground: 0 0% 0%;
-
-  --destructive: 2.04 74.62% 61.37%;
-
+  /* Legacy mappings for Tailwind components */
+  --foreground: 188 6% 10%;
+  --border: 188 6% 85%;
+  --card: 188 6% 98%;
+  --card-foreground: 188 6% 10%;
+  --card-border: 188 6% 88%;
+  --popover: 188 6% 98%;
+  --popover-foreground: 188 6% 10%;
+  --popover-border: 188 6% 88%;
+  --muted: 188 6% 92%;
+  --muted-foreground: 188 6% 45%;
+  --accent: 189 100% 94%;
+  --accent-foreground: 189 100% 20%;
+  --destructive: 0 84% 60%;
   --destructive-foreground: 0 0% 100%;
+  --input: 188 6% 85%;
+  --ring: 189 100% 67%;
 
-  --input: 0 0% 0%;
-  --ring: 0 0% 0%;
-  --chart-1: 203.8863 88.2845% 53.1373%;
-  --chart-2: 159.7826 100% 36.0784%;
-  --chart-3: 42.0290 92.8251% 56.2745%;
-  --chart-4: 147.1429 78.5047% 41.9608%;
-  --chart-5: 341.4894 75.2000% 50.9804%;
-
-  --font-sans: 'IBM Plex Mono', monospace;
-  --font-serif: 'Geist', sans-serif;
-  --font-mono: 'Geist Mono', monospace;
-  --radius: 0rem;
-  --shadow-2xs: 0px 2px 0px 0px hsl(202.8169 89.1213% 53.1373% / 0.00);
-  --shadow-xs: 0px 2px 0px 0px hsl(202.8169 89.1213% 53.1373% / 0.00);
-  --shadow-sm: 0px 2px 0px 0px hsl(202.8169 89.1213% 53.1373% / 0.00), 0px 1px 2px -1px hsl(202.8169 89.1213% 53.1373% / 0.00);
-  --shadow: 0px 2px 0px 0px hsl(202.8169 89.1213% 53.1373% / 0.00), 0px 1px 2px -1px hsl(202.8169 89.1213% 53.1373% / 0.00);
-  --shadow-md: 0px 2px 0px 0px hsl(202.8169 89.1213% 53.1373% / 0.00), 0px 2px 4px -1px hsl(202.8169 89.1213% 53.1373% / 0.00);
-  --shadow-lg: 0px 2px 0px 0px hsl(202.8169 89.1213% 53.1373% / 0.00), 0px 4px 6px -1px hsl(202.8169 89.1213% 53.1373% / 0.00);
-  --shadow-xl: 0px 2px 0px 0px hsl(202.8169 89.1213% 53.1373% / 0.00), 0px 8px 10px -1px hsl(202.8169 89.1213% 53.1373% / 0.00);
-  --shadow-2xl: 0px 2px 0px 0px hsl(202.8169 89.1213% 53.1373% / 0.00);
-  --tracking-normal: 0em;
-  --spacing: 0.25rem;
-
-  /* Automatically computed borders - intensity can be controlled by the user by the --opaque-button-border-intensity setting */
-
-  /* Fallback for older browsers */
-  --sidebar-primary-border: hsl(from hsl(var(--sidebar-primary)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
-  --sidebar-primary-border: hsl(from hsl(var(--sidebar-primary)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
-
-  /* Fallback for older browsers */
-  --sidebar-accent-border: hsl(from hsl(var(--sidebar-accent)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
-  --sidebar-accent-border: hsl(from hsl(var(--sidebar-accent)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
-
-  /* Fallback for older browsers */
-  --primary-border: hsl(from hsl(var(--primary)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
-  --primary-border: hsl(from hsl(var(--primary)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
-
-  /* Fallback for older browsers */
-  --secondary-border: hsl(from hsl(var(--secondary)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
-  --secondary-border: hsl(from hsl(var(--secondary)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
-
-  /* Fallback for older browsers */
-  --muted-border: hsl(from hsl(var(--muted)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
-  --muted-border: hsl(from hsl(var(--muted)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
-
-  /* Fallback for older browsers */
-  --accent-border: hsl(from hsl(var(--accent)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
-  --accent-border: hsl(from hsl(var(--accent)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
-
-  /* Fallback for older browsers */
-  --destructive-border: hsl(from hsl(var(--destructive)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
-  --destructive-border: hsl(from hsl(var(--destructive)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
-}
-
-.dark {
-  --button-outline: rgba(255,255,255, .08);
-  --badge-outline: rgba(255,255,255, .03);
-
-  --opaque-button-border-intensity: 6;
-
-  --elevate-1: rgba(255,255,255, .03);
-  --elevate-2: rgba(255,255,255, .06);
-
-  --background: 0 0% 4%;
-
-  --foreground: 0 0% 90%;
-
-  --border: 0 0% 12%;
-
-  --card: 0 0% 6%;
-
-  --card-foreground: 0 0% 88%;
-
-  --card-border: 0 0% 14%;
-
-  --sidebar: 0 0% 5%;
-
-  --sidebar-foreground: 0 0% 88%;
-
-  --sidebar-border: 0 0% 12%;
-
-  --sidebar-primary: 210 100% 60%;
-
+  --sidebar: 188 6% 97%;
+  --sidebar-foreground: 188 6% 10%;
+  --sidebar-border: 188 6% 88%;
+  --sidebar-primary: 189 100% 67%;
   --sidebar-primary-foreground: 0 0% 100%;
+  --sidebar-accent: 189 100% 94%;
+  --sidebar-accent-foreground: 189 100% 20%;
+  --sidebar-ring: 189 100% 67%;
 
-  --sidebar-accent: 0 0% 8%;
-
-  --sidebar-accent-foreground: 0 0% 95%;
-
-  --sidebar-ring: 210 100% 60%;
-
-  --popover: 0 0% 5%;
-
-  --popover-foreground: 0 0% 90%;
-
-  --popover-border: 0 0% 14%;
-
-  --primary: 210 100% 60%;
-
-  --primary-foreground: 0 0% 100%;
-
-  --secondary: 0 0% 12%;
-
-  --secondary-foreground: 0 0% 88%;
-
-  --muted: 0 0% 8%;
-
-  --muted-foreground: 0 0% 55%;
-
-  --accent: 0 0% 10%;
-
-  --accent-foreground: 0 0% 95%;
-
-  --destructive: 0 85% 60%;
-
-  --destructive-foreground: 0 0% 100%;
-
-  --input: 0 0% 12%;
-  --ring: 210 100% 60%;
-  --chart-1: 210 100% 60%;
-  --chart-2: 160 100% 40%;
+  --chart-1: 189 100% 67%;
+  --chart-2: 160 100% 45%;
   --chart-3: 40 95% 60%;
   --chart-4: 145 80% 45%;
   --chart-5: 340 75% 55%;
 
-  --shadow-2xs: 0px 1px 2px 0px rgba(0,0,0, 0.3);
-  --shadow-xs: 0px 1px 3px 0px rgba(0,0,0, 0.4);
-  --shadow-sm: 0px 2px 4px 0px rgba(0,0,0, 0.4), 0px 1px 2px -1px rgba(0,0,0, 0.3);
-  --shadow: 0px 4px 6px 0px rgba(0,0,0, 0.4), 0px 2px 4px -1px rgba(0,0,0, 0.3);
-  --shadow-md: 0px 6px 12px 0px rgba(0,0,0, 0.5), 0px 4px 8px -2px rgba(0,0,0, 0.4);
-  --shadow-lg: 0px 10px 20px 0px rgba(0,0,0, 0.6), 0px 6px 12px -2px rgba(0,0,0, 0.5);
-  --shadow-xl: 0px 20px 40px 0px rgba(0,0,0, 0.7), 0px 10px 20px -4px rgba(0,0,0, 0.6);
-  --shadow-2xl: 0px 30px 60px 0px rgba(0,0,0, 0.8);
-
-  --sidebar-primary-border: hsl(from hsl(var(--sidebar-primary)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
-  --sidebar-primary-border: hsl(from hsl(var(--sidebar-primary)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
-
-  --sidebar-accent-border: hsl(from hsl(var(--sidebar-accent)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
-  --sidebar-accent-border: hsl(from hsl(var(--sidebar-accent)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
-
-  --primary-border: hsl(from hsl(var(--primary)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
-  --primary-border: hsl(from hsl(var(--primary)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
-
-  --secondary-border: hsl(from hsl(var(--secondary)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
-  --secondary-border: hsl(from hsl(var(--secondary)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
-
-  --muted-border: hsl(from hsl(var(--muted)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
-  --muted-border: hsl(from hsl(var(--muted)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
-
-  --accent-border: hsl(from hsl(var(--accent)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
-  --accent-border: hsl(from hsl(var(--accent)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
-
-  --destructive-border: hsl(from hsl(var(--destructive)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
-  --destructive-border: hsl(from hsl(var(--destructive)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
-  --radius: 0.5rem;
+  --font-sans: 'Roboto', system-ui, sans-serif;
+  --font-serif: 'Roboto Slab', Georgia, serif;
+  --font-mono: 'Roboto Mono', monospace;
+  --radius: 1rem;
+  --tracking-normal: 0em;
   --spacing: 0.25rem;
-  --font-mono: Menlo, Monaco, monospace;
-  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  --font-serif: Georgia, serif;
+
+  /* MD3 Elevation Shadows - Light */
+  --shadow-2xs: 0 1px 2px rgba(0,0,0,0.05);
+  --shadow-xs: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-sm: 0 2px 4px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow: 0 4px 8px rgba(0,0,0,0.10), 0 2px 4px rgba(0,0,0,0.06);
+  --shadow-md: 0 6px 12px rgba(0,0,0,0.12), 0 4px 6px rgba(0,0,0,0.08);
+  --shadow-lg: 0 12px 20px rgba(0,0,0,0.15), 0 6px 10px rgba(0,0,0,0.10);
+  --shadow-xl: 0 24px 40px rgba(0,0,0,0.18), 0 12px 20px rgba(0,0,0,0.12);
+  --shadow-2xl: 0 32px 60px rgba(0,0,0,0.22);
+
+  /* Button borders */
+  --button-outline: rgba(0,0,0,0.10);
+  --badge-outline: rgba(0,0,0,0.05);
+  --opaque-button-border-intensity: 5;
+  --elevate-1: rgba(79, 195, 247, 0.08);
+  --elevate-2: rgba(79, 195, 247, 0.12);
+}
+
+/* Material Design 3 - Dark Theme */
+.dark {
+  /* MD3 State Layers */
+  --state-layer-hover: rgba(79, 195, 247, 0.08);
+  --state-layer-press: rgba(79, 195, 247, 0.12);
+  --state-layer-focus: rgba(79, 195, 247, 0.12);
+
+  /* MD3 Color Tokens - Dark Theme */
+  --primary: 189 100% 67%;
+  --on-primary: 189 100% 10%;
+  --primary-container: 189 100% 15%;
+  --on-primary-container: 189 100% 90%;
+
+  --secondary: 190 30% 60%;
+  --on-secondary: 190 30% 10%;
+  --secondary-container: 190 30% 20%;
+  --on-secondary-container: 190 30% 90%;
+
+  --tertiary: 160 50% 60%;
+  --on-tertiary: 160 50% 10%;
+  --tertiary-container: 160 50% 20%;
+  --on-tertiary-container: 160 50% 90%;
+
+  --error: 0 85% 70%;
+  --on-error: 0 85% 10%;
+  --error-container: 0 85% 20%;
+  --on-error-container: 0 85% 90%;
+
+  --background: 188 6% 6%;
+  --on-background: 188 6% 95%;
+
+  --surface: 188 6% 8%;
+  --on-surface: 188 6% 95%;
+  --surface-variant: 188 10% 12%;
+  --on-surface-variant: 188 6% 70%;
+
+  --surface-container: 188 6% 10%;
+  --surface-container-low: 188 6% 8%;
+  --surface-container-high: 188 6% 12%;
+  --surface-container-highest: 188 6% 14%;
+
+  --outline: 188 6% 55%;
+  --outline-variant: 188 6% 20%;
+
+  --shadow: 0 0% 0%;
+  --scrim: 0 0% 0%;
+
+  /* Legacy mappings */
+  --foreground: 188 6% 95%;
+  --border: 188 6% 18%;
+  --card: 188 6% 10%;
+  --card-foreground: 188 6% 95%;
+  --card-border: 188 6% 15%;
+  --popover: 188 6% 10%;
+  --popover-foreground: 188 6% 95%;
+  --popover-border: 188 6% 15%;
+  --muted: 188 6% 12%;
+  --muted-foreground: 188 6% 65%;
+  --accent: 189 100% 15%;
+  --accent-foreground: 189 100% 90%;
+  --destructive: 0 85% 65%;
+  --destructive-foreground: 0 0% 100%;
+  --input: 188 6% 15%;
+  --ring: 189 100% 67%;
+
+  --sidebar: 188 6% 8%;
+  --sidebar-foreground: 188 6% 95%;
+  --sidebar-border: 188 6% 15%;
+  --sidebar-primary: 189 100% 67%;
+  --sidebar-primary-foreground: 0 0% 100%;
+  --sidebar-accent: 189 100% 12%;
+  --sidebar-accent-foreground: 189 100% 90%;
+  --sidebar-ring: 189 100% 67%;
+
+  --chart-1: 189 100% 67%;
+  --chart-2: 160 100% 50%;
+  --chart-3: 40 95% 60%;
+  --chart-4: 145 80% 50%;
+  --chart-5: 340 75% 60%;
+
+  /* MD3 Elevation Shadows - Dark (stronger for visibility) */
+  --shadow-2xs: 0 1px 2px rgba(0,0,0,0.40);
+  --shadow-xs: 0 1px 3px rgba(0,0,0,0.50), 0 1px 2px rgba(0,0,0,0.35);
+  --shadow-sm: 0 2px 4px rgba(0,0,0,0.50), 0 1px 2px rgba(0,0,0,0.35);
+  --shadow: 0 4px 8px rgba(0,0,0,0.55), 0 2px 4px rgba(0,0,0,0.40);
+  --shadow-md: 0 6px 12px rgba(0,0,0,0.60), 0 4px 6px rgba(0,0,0,0.45);
+  --shadow-lg: 0 12px 20px rgba(0,0,0,0.65), 0 6px 10px rgba(0,0,0,0.50);
+  --shadow-xl: 0 24px 40px rgba(0,0,0,0.70), 0 12px 20px rgba(0,0,0,0.55);
+  --shadow-2xl: 0 32px 60px rgba(0,0,0,0.80);
+
+  --button-outline: rgba(255,255,255,0.08);
+  --badge-outline: rgba(255,255,255,0.03);
+  --opaque-button-border-intensity: 3;
+  --elevate-1: rgba(255,255,255,0.05);
+  --elevate-2: rgba(255,255,255,0.08);
+
+  --radius: 1rem;
+  --spacing: 0.25rem;
+  --font-sans: 'Roboto', system-ui, sans-serif;
+  --font-serif: 'Roboto Slab', Georgia, serif;
+  --font-mono: 'Roboto Mono', monospace;
   --tracking-normal: 0em;
 }
 

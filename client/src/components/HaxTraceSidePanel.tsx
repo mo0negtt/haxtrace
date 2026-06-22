@@ -115,7 +115,7 @@ function SatBrightCanvas({
   const cy = (1 - brightness) * 100;
 
   return (
-    <div className="relative rounded-xl overflow-hidden" style={{ height: 130 }}>
+    <div className="relative rounded-2xl overflow-hidden" style={{ height: 130 }}>
       <canvas
         ref={canvasRef}
         width={248}
@@ -129,9 +129,9 @@ function SatBrightCanvas({
         style={{
           left: `${cx}%`, top: `${cy}%`,
           transform: 'translate(-50%, -50%)',
-          width: 12, height: 12, borderRadius: '50%',
-          border: '2px solid white',
-          boxShadow: '0 0 0 1px rgba(0,0,0,0.4)',
+          width: 16, height: 16, borderRadius: '50%',
+          border: '3px solid white',
+          boxShadow: '0 0 0 2px rgba(0,0,0,0.3), 0 2px 8px rgba(0,0,0,0.4)',
         }}
       />
     </div>
@@ -140,20 +140,19 @@ function SatBrightCanvas({
 
 function CheckerSlider({ value, onChange, label }: { value: number; onChange: (v: number) => void; label: string }) {
   return (
-    <div className="space-y-1">
+    <div className="space-y-1.5">
       <div className="flex justify-between items-center">
-        <span className="text-[10px] text-white/35 uppercase tracking-widest">{label}</span>
-        <span className="text-[11px] font-mono text-white/55">{Math.round(value * 100)}%</span>
+        <span className="text-xs text-on-surface-variant uppercase tracking-wider font-medium">{label}</span>
+        <span className="text-xs text-on-surface font-mono">{Math.round(value * 100)}%</span>
       </div>
-      <div className="relative h-4 flex items-center">
-        <div className="absolute inset-x-0 h-2 rounded-full overflow-hidden"
-          style={{ background: `repeating-conic-gradient(#555 0% 25%, #333 0% 50%) 0 0 / 8px 8px` }}>
-          <div className="absolute inset-y-0 left-0 rounded-full"
-            style={{ width: `${value * 100}%`, background: 'rgba(255,255,255,0.85)' }} />
+      <div className="relative h-6 flex items-center">
+        <div className="absolute inset-x-0 h-3 rounded-full overflow-hidden bg-surface-container-highest">
+          <div className="absolute inset-y-0 left-0 rounded-full bg-primary transition-all duration-75"
+            style={{ width: `${value * 100}%` }} />
         </div>
         <input type="range" min={0} max={1} step={0.01} value={value}
           onChange={(e) => onChange(parseFloat(e.target.value))}
-          className="relative w-full appearance-none bg-transparent cursor-pointer z-10" style={{ height: 16 }} />
+          className="relative w-full appearance-none bg-transparent cursor-pointer z-10" style={{ height: 24 }} />
       </div>
     </div>
   );
@@ -161,29 +160,30 @@ function CheckerSlider({ value, onChange, label }: { value: number; onChange: (v
 
 function HueSlider({ hue, onChange }: { hue: number; onChange: (h: number) => void }) {
   return (
-    <div className="space-y-1">
+    <div className="space-y-1.5">
       <div className="flex justify-between items-center">
-        <span className="text-[10px] text-white/35 uppercase tracking-widest">Hue</span>
-        <span className="text-[11px] font-mono text-white/55">{Math.round(hue)}°</span>
+        <span className="text-xs text-on-surface-variant uppercase tracking-wider font-medium">Hue</span>
+        <span className="text-xs text-on-surface font-mono">{Math.round(hue)}°</span>
       </div>
-      <div className="relative h-4 flex items-center">
-        <div className="absolute inset-x-0 h-2 rounded-full"
+      <div className="relative h-6 flex items-center">
+        <div className="absolute inset-x-0 h-3 rounded-full"
           style={{ background: 'linear-gradient(to right, #f00, #ff0, #0f0, #0ff, #00f, #f0f, #f00)' }} />
         <input type="range" min={0} max={360} step={1} value={hue}
           onChange={(e) => onChange(parseFloat(e.target.value))}
-          className="relative w-full appearance-none bg-transparent cursor-pointer z-10" style={{ height: 16 }} />
+          className="relative w-full appearance-none bg-transparent cursor-pointer z-10" style={{ height: 24 }} />
       </div>
     </div>
   );
 }
 
-function IOSToggle({ active, onToggle }: { active: boolean; onToggle: () => void }) {
+function MD3Switch({ active, onToggle }: { active: boolean; onToggle: () => void }) {
   return (
-    <button onClick={onToggle} className="flex-shrink-0 relative focus:outline-none" style={{ width: 44, height: 24 }}>
-      <div className="absolute inset-0 rounded-full transition-all duration-200"
-        style={{ background: active ? '#00d4ff' : 'rgba(255,255,255,0.12)' }} />
-      <div className="absolute top-1 w-4 h-4 rounded-full bg-white shadow-md transition-all duration-200"
-        style={{ left: active ? 'calc(100% - 20px)' : '4px' }} />
+    <button
+      onClick={onToggle}
+      className="relative w-14 h-8 rounded-full transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
+    >
+      <div className={`absolute inset-0 rounded-full transition-all duration-200 ${active ? 'bg-primary' : 'bg-surface-container-highest'}`} />
+      <div className={`absolute top-1 w-6 h-6 rounded-full bg-on-primary shadow-md transition-all duration-200 ${active ? 'left-7' : 'left-1'}`} />
     </button>
   );
 }
@@ -286,84 +286,65 @@ export const HaxTraceSidePanel = ({ isHidden, setIsHidden }: HaxTraceSidePanelPr
   if (isHidden) return null;
 
   return (
-    <div
-      className="flex-shrink-0 flex flex-col overflow-hidden h-full"
-      style={{
-        width: 280,
-        background: 'rgba(14,14,16,0.82)',
-        backdropFilter: 'blur(24px)',
-        WebkitBackdropFilter: 'blur(24px)',
-        borderLeft: '1px solid rgba(255,255,255,0.06)',
-        boxShadow: '-8px 0 40px rgba(0,0,0,0.5)',
-        borderRadius: '20px 0 0 20px',
-      }}
-    >
-      {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 flex-shrink-0"
-        style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-        <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-white/20 select-none">Properties</span>
+    <div className="flex-shrink-0 flex flex-col overflow-hidden h-full w-[300px] bg-surface-container border-l border-outline-variant shadow-xl">
+      {/* Header - MD3 Top App Bar style */}
+      <div className="flex items-center justify-between px-4 py-4 flex-shrink-0 bg-surface-container">
+        <span className="text-xs font-semibold uppercase tracking-wider text-on-surface-variant select-none">Properties</span>
         <button
           onClick={() => setIsHidden(true)}
-          className="w-7 h-7 flex items-center justify-center rounded-xl text-white/25 hover:text-white/70 hover:bg-white/[0.08] transition-all"
+          className="w-9 h-9 flex items-center justify-center rounded-full text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-all duration-200"
         >
-          <X className="w-3.5 h-3.5" />
+          <X className="w-4 h-4" />
         </button>
       </div>
 
-      <div className="flex-1 overflow-y-auto overflow-x-hidden"
-        style={{ scrollbarWidth: 'thin', scrollbarColor: 'rgba(255,255,255,0.08) transparent' }}>
+      <div className="flex-1 overflow-y-auto overflow-x-hidden">
 
         {/* ASISTENCIA */}
-        <CollapsibleSection label="Assistance" icon={<Sparkles className="w-3.5 h-3.5" />}>
-          <div className="space-y-2.5">
+        <CollapsibleSection label="Assistance" icon={<Sparkles className="w-4 h-4" />}>
+          <div className="space-y-3">
             {/* Snap to Grid */}
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Magnet className="w-3.5 h-3.5 text-white/25" />
-                <span className="text-[12px] text-white/50">Snap to Grid</span>
+            <div className="flex items-center justify-between py-1">
+              <div className="flex items-center gap-2.5">
+                <Magnet className="w-4 h-4 text-on-surface-variant" />
+                <span className="text-sm text-on-surface">Snap to Grid</span>
               </div>
-              <IOSToggle active={snapToGrid} onToggle={toggleSnapToGrid} />
+              <MD3Switch active={snapToGrid} onToggle={toggleSnapToGrid} />
             </div>
             {/* Smart Guides */}
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <ScanLine className="w-3.5 h-3.5" style={{ color: smartGuides ? '#00d4ff' : 'rgba(255,255,255,0.25)' }} />
-                <span className="text-[12px]" style={{ color: smartGuides ? 'rgba(255,255,255,0.75)' : 'rgba(255,255,255,0.5)' }}>Smart Guides</span>
+            <div className="flex items-center justify-between py-1">
+              <div className="flex items-center gap-2.5">
+                <ScanLine className={`w-4 h-4 ${smartGuides ? 'text-primary' : 'text-on-surface-variant'}`} />
+                <span className={`text-sm ${smartGuides ? 'text-on-surface' : 'text-on-surface-variant'}`}>Smart Guides</span>
               </div>
-              <IOSToggle active={smartGuides} onToggle={toggleSmartGuides} />
+              <MD3Switch active={smartGuides} onToggle={toggleSmartGuides} />
             </div>
             {/* Vertex Snap */}
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Crosshair className="w-3.5 h-3.5" style={{ color: vertexSnap ? '#00d4ff' : 'rgba(255,255,255,0.25)' }} />
-                <span className="text-[12px]" style={{ color: vertexSnap ? 'rgba(255,255,255,0.75)' : 'rgba(255,255,255,0.5)' }}>Vertex Snap</span>
+            <div className="flex items-center justify-between py-1">
+              <div className="flex items-center gap-2.5">
+                <Crosshair className={`w-4 h-4 ${vertexSnap ? 'text-primary' : 'text-on-surface-variant'}`} />
+                <span className={`text-sm ${vertexSnap ? 'text-on-surface' : 'text-on-surface-variant'}`}>Vertex Snap</span>
               </div>
-              <IOSToggle active={vertexSnap} onToggle={toggleVertexSnap} />
+              <MD3Switch active={vertexSnap} onToggle={toggleVertexSnap} />
             </div>
             {/* Mirror Mode */}
-            <div className="space-y-1.5">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <FlipHorizontal2 className="w-3.5 h-3.5" style={{ color: mirrorMode ? '#00d4ff' : 'rgba(255,255,255,0.25)' }} />
-                  <span className="text-[12px]" style={{ color: mirrorMode ? 'rgba(255,255,255,0.75)' : 'rgba(255,255,255,0.5)' }}>Mirror Mode</span>
+            <div className="space-y-2">
+              <div className="flex items-center justify-between py-1">
+                <div className="flex items-center gap-2.5">
+                  <FlipHorizontal2 className={`w-4 h-4 ${mirrorMode ? 'text-primary' : 'text-on-surface-variant'}`} />
+                  <span className={`text-sm ${mirrorMode ? 'text-on-surface' : 'text-on-surface-variant'}`}>Mirror Mode</span>
                 </div>
-                <IOSToggle active={mirrorMode} onToggle={toggleMirrorMode} />
+                <MD3Switch active={mirrorMode} onToggle={toggleMirrorMode} />
               </div>
               {mirrorMode && (
-                <div className="flex gap-1.5 ml-5">
+                <div className="flex gap-2 ml-6">
                   {(['x', 'y'] as const).map(ax => (
                     <button key={ax} onClick={() => setMirrorAxis(ax)}
-                      className="flex-1 h-7 rounded-lg text-[11px] font-medium uppercase tracking-wider transition-all"
-                      style={mirrorAxis === ax ? {
-                        background: 'rgba(0,212,255,0.18)',
-                        color: '#00d4ff',
-                        border: '1px solid rgba(0,212,255,0.35)',
-                        boxShadow: '0 0 10px rgba(0,212,255,0.25)',
-                      } : {
-                        background: 'rgba(255,255,255,0.04)',
-                        color: 'rgba(255,255,255,0.35)',
-                        border: '1px solid rgba(255,255,255,0.07)',
-                      }}>
+                      className={`flex-1 h-9 rounded-xl text-xs font-medium uppercase tracking-wider transition-all duration-200 ${
+                        mirrorAxis === ax
+                          ? 'bg-primary-container text-on-primary-container'
+                          : 'bg-surface-container-high text-on-surface-variant hover:bg-surface-container-highest'
+                      }`}>
                       {ax === 'x' ? 'Vertical' : 'Horizontal'}
                     </button>
                   ))}
@@ -381,7 +362,7 @@ export const HaxTraceSidePanel = ({ isHidden, setIsHidden }: HaxTraceSidePanelPr
             <NumberField label="X" value={selectedVertex?.x ?? mousePos.x} />
             <NumberField label="Y" value={selectedVertex?.y ?? mousePos.y} />
           </div>
-          <div className="mt-2 space-y-0.5">
+          <div className="mt-3 space-y-1">
             <InfoPair label="Cursor" value={`${mousePos.x}, ${mousePos.y}`} />
             <InfoPair label="Vertices" value={String(map.vertexes.length)} />
             <InfoPair label="Segments" value={String(map.segments.length)} />
@@ -397,91 +378,68 @@ export const HaxTraceSidePanel = ({ isHidden, setIsHidden }: HaxTraceSidePanelPr
 
           {!map.bg.image ? (
             <div
-              className="rounded-xl flex flex-col items-center justify-center gap-2 py-6 cursor-pointer transition-all"
-              style={{
-                border: '1.5px dashed rgba(255,255,255,0.12)',
-                background: 'rgba(255,255,255,0.03)',
-              }}
+              className="rounded-2xl flex flex-col items-center justify-center gap-3 py-8 cursor-pointer transition-all duration-200 border-2 border-dashed border-outline-variant hover:border-primary hover:bg-primary-container/10"
               onClick={() => bgFileRef.current?.click()}
               onDragOver={(e) => e.preventDefault()}
               onDrop={handleBgDrop}
             >
-              <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: 'rgba(0,212,255,0.08)' }}>
-                <Upload className="w-5 h-5 text-[#00d4ff]/60" />
+              <div className="w-12 h-12 rounded-2xl flex items-center justify-center bg-primary-container">
+                <Upload className="w-6 h-6 text-on-primary-container" />
               </div>
               <div className="text-center">
-                <p className="text-[12px] text-white/45 font-medium">Upload Image</p>
-                <p className="text-[10px] text-white/20 mt-0.5">Click or drag & drop</p>
+                <p className="text-sm text-on-surface font-medium">Upload Image</p>
+                <p className="text-xs text-on-surface-variant mt-0.5">Click or drag & drop</p>
               </div>
             </div>
           ) : (
-            <div className="space-y-3">
+            <div className="space-y-4">
               {/* Image status row */}
-              <div className="flex items-center justify-between px-3 py-2 rounded-xl"
-                style={{ background: 'rgba(0,212,255,0.08)', border: '1px solid rgba(0,212,255,0.2)' }}>
-                <div className="flex items-center gap-2">
-                  <Image className="w-3.5 h-3.5 text-[#00d4ff]/70" />
-                  <span className="text-[11px] text-[#00d4ff]/80 font-medium">Image loaded</span>
+              <div className="flex items-center justify-between px-4 py-3 rounded-2xl bg-primary-container">
+                <div className="flex items-center gap-2.5">
+                  <Image className="w-4 h-4 text-on-primary-container" />
+                  <span className="text-sm text-on-primary-container font-medium">Image loaded</span>
                 </div>
                 <button onClick={removeBackgroundImage}
-                  className="w-6 h-6 flex items-center justify-center rounded-lg text-red-400/60 hover:text-red-400 hover:bg-red-500/10 transition-all">
-                  <Trash2 className="w-3.5 h-3.5" />
+                  className="w-8 h-8 flex items-center justify-center rounded-full text-error hover:bg-error-container hover:text-on-error-container transition-all duration-200">
+                  <Trash2 className="w-4 h-4" />
                 </button>
               </div>
 
               {/* Opacity */}
-              <div className="space-y-1">
-                <div className="flex justify-between">
-                  <span className="text-[10px] text-white/25 uppercase tracking-widest">Opacity</span>
-                  <span className="text-[11px] font-mono text-white/50">{Math.round(map.bg.image.opacity * 100)}%</span>
-                </div>
-                <div className="relative h-4 flex items-center">
-                  <div className="absolute inset-x-0 h-2 rounded-full overflow-hidden"
-                    style={{ background: `repeating-conic-gradient(#555 0% 25%, #333 0% 50%) 0 0 / 8px 8px` }}>
-                    <div className="absolute inset-y-0 left-0 rounded-full"
-                      style={{ width: `${map.bg.image.opacity * 100}%`, background: 'rgba(255,255,255,0.85)' }} />
-                  </div>
-                  <input type="range" min={0} max={1} step={0.01} value={map.bg.image.opacity}
-                    onChange={(e) => updateBackgroundImage({ ...map.bg.image!, opacity: parseFloat(e.target.value) })}
-                    className="relative w-full appearance-none bg-transparent cursor-pointer z-10" style={{ height: 16 }} />
-                </div>
-              </div>
+              <CheckerSlider label="Opacity" value={map.bg.image.opacity}
+                onChange={(v) => updateBackgroundImage({ ...map.bg.image!, opacity: v })} />
 
               {/* Scale */}
-              <div className="space-y-1">
+              <div className="space-y-1.5">
                 <div className="flex justify-between">
-                  <span className="text-[10px] text-white/25 uppercase tracking-widest">Scale</span>
-                  <span className="text-[11px] font-mono text-white/50">{Math.round(map.bg.image.scale * 100)}%</span>
+                  <span className="text-xs text-on-surface-variant uppercase tracking-wider font-medium">Scale</span>
+                  <span className="text-xs text-on-surface font-mono">{Math.round(map.bg.image.scale * 100)}%</span>
                 </div>
-                <div className="relative h-4 flex items-center">
-                  <div className="absolute inset-x-0 h-2 rounded-full" style={{ background: 'rgba(255,255,255,0.07)' }} />
-                  <div className="absolute h-2 top-1/2 -translate-y-1/2 rounded-full left-0"
-                    style={{ width: `${((map.bg.image.scale - 0.1) / 4.9) * 100}%`, background: 'linear-gradient(to right,#0ea5e9,#00d4ff)' }} />
+                <div className="relative h-6 flex items-center">
+                  <div className="absolute inset-x-0 h-3 rounded-full bg-surface-container-highest" />
+                  <div className="absolute h-3 top-1/2 -translate-y-1/2 rounded-full left-0 bg-primary"
+                    style={{ width: `${((map.bg.image.scale - 0.1) / 4.9) * 100}%` }} />
                   <input type="range" min={0.1} max={5} step={0.01} value={map.bg.image.scale}
                     onChange={(e) => updateBackgroundImage({ ...map.bg.image!, scale: parseFloat(e.target.value) })}
-                    className="relative w-full appearance-none bg-transparent cursor-pointer z-10" style={{ height: 16 }} />
+                    className="relative w-full appearance-none bg-transparent cursor-pointer z-10" style={{ height: 24 }} />
                 </div>
               </div>
 
               {/* Position offset */}
-              <div className="space-y-1.5">
-                <span className="text-[10px] text-white/25 uppercase tracking-widest">Position Offset</span>
+              <div className="space-y-2">
+                <span className="text-xs text-on-surface-variant uppercase tracking-wider font-medium">Position Offset</span>
                 <div className="flex gap-2">
-                  <div className="flex-1 flex items-center rounded-xl overflow-hidden"
-                    style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }}>
-                    <span className="px-2.5 text-[10px] text-white/25 font-semibold tracking-wider select-none"
-                      style={{ borderRight: '1px solid rgba(255,255,255,0.06)' }}>X</span>
+                  <div className="flex-1 flex items-center rounded-xl overflow-hidden bg-surface-container-high border border-outline-variant">
+                    <span className="px-3 text-xs text-on-surface-variant font-semibold tracking-wider select-none border-r border-outline-variant">X</span>
                     <input type="number" value={map.bg.image.offsetX}
                       onChange={(e) => updateBackgroundImage({ ...map.bg.image!, offsetX: Number(e.target.value) })}
-                      className="flex-1 px-2 py-1.5 text-[12px] font-mono text-white/65 bg-transparent outline-none border-0 w-0 min-w-0" />
+                      className="flex-1 px-3 py-2 text-sm text-on-surface bg-transparent outline-none border-0 w-0 min-w-0" />
                   </div>
-                  <div className="flex-1 flex items-center rounded-xl overflow-hidden"
-                    style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }}>
-                    <span className="px-2.5 text-[10px] text-white/25 font-semibold tracking-wider select-none"
-                      style={{ borderRight: '1px solid rgba(255,255,255,0.06)' }}>Y</span>
+                  <div className="flex-1 flex items-center rounded-xl overflow-hidden bg-surface-container-high border border-outline-variant">
+                    <span className="px-3 text-xs text-on-surface-variant font-semibold tracking-wider select-none border-r border-outline-variant">Y</span>
                     <input type="number" value={map.bg.image.offsetY}
                       onChange={(e) => updateBackgroundImage({ ...map.bg.image!, offsetY: Number(e.target.value) })}
-                      className="flex-1 px-2 py-1.5 text-[12px] font-mono text-white/65 bg-transparent outline-none border-0 w-0 min-w-0" />
+                      className="flex-1 px-3 py-2 text-sm text-on-surface bg-transparent outline-none border-0 w-0 min-w-0" />
                   </div>
                 </div>
               </div>
@@ -490,22 +448,20 @@ export const HaxTraceSidePanel = ({ isHidden, setIsHidden }: HaxTraceSidePanelPr
               <div className="flex gap-2">
                 <button
                   onClick={() => updateBackgroundImage({ ...map.bg.image!, locked: !map.bg.image!.locked })}
-                  className="flex-1 h-8 flex items-center justify-center gap-1.5 rounded-xl transition-all text-[11px]"
-                  style={{
-                    background: map.bg.image.locked ? 'rgba(0,212,255,0.12)' : 'rgba(255,255,255,0.04)',
-                    border: map.bg.image.locked ? '1px solid rgba(0,212,255,0.35)' : '1px solid rgba(255,255,255,0.06)',
-                    color: map.bg.image.locked ? '#00d4ff' : 'rgba(255,255,255,0.35)',
-                  }}
+                  className={`flex-1 h-10 flex items-center justify-center gap-2 rounded-xl text-xs font-medium transition-all duration-200 ${
+                    map.bg.image.locked
+                      ? 'bg-primary-container text-on-primary-container'
+                      : 'bg-surface-container-high text-on-surface-variant hover:bg-surface-container-highest'
+                  }`}
                 >
-                  {map.bg.image.locked ? <Lock className="w-3.5 h-3.5" /> : <Unlock className="w-3.5 h-3.5" />}
+                  {map.bg.image.locked ? <Lock className="w-4 h-4" /> : <Unlock className="w-4 h-4" />}
                   {map.bg.image.locked ? 'Locked' : 'Lock'}
                 </button>
                 <button
                   onClick={() => updateBackgroundImage({ ...map.bg.image!, offsetX: 0, offsetY: 0, scale: 1 })}
-                  className="flex-1 h-8 flex items-center justify-center gap-1.5 rounded-xl transition-all text-[11px]"
-                  style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.35)' }}
+                  className="flex-1 h-10 flex items-center justify-center gap-2 rounded-xl bg-surface-container-high text-on-surface-variant text-xs font-medium hover:bg-surface-container-highest transition-all duration-200"
                 >
-                  <RotateCcw className="w-3.5 h-3.5" />
+                  <RotateCcw className="w-4 h-4" />
                   Reset
                 </button>
               </div>
@@ -518,35 +474,33 @@ export const HaxTraceSidePanel = ({ isHidden, setIsHidden }: HaxTraceSidePanelPr
         {/* APPEARANCE & STYLE */}
         <Section label="Appearance & Style">
           <SatBrightCanvas hue={hsv[0]} saturation={hsv[1]} brightness={hsv[2]} onChange={handleSatBright} />
-          <div className="mt-2 space-y-2">
+          <div className="mt-3">
             <HueSlider hue={hsv[0]} onChange={handleHue} />
           </div>
-          <div className="flex items-center gap-2 mt-3">
-            <div className="w-8 h-8 rounded-lg flex-shrink-0 border border-white/10" style={{ background: displayHex }} />
-            <div className="flex items-center flex-1 bg-white/[0.05] rounded-xl px-2.5 h-8"
-              style={{ border: '1px solid rgba(255,255,255,0.07)' }}>
-              <span className="text-[11px] text-white/25 font-mono mr-1">#</span>
+          <div className="flex items-center gap-3 mt-4">
+            <div className="w-10 h-10 rounded-2xl flex-shrink-0 border-2 border-outline-variant shadow-sm" style={{ background: displayHex }} />
+            <div className="flex items-center flex-1 bg-surface-container-high rounded-xl px-3 h-10 border border-outline-variant">
+              <span className="text-xs text-on-surface-variant font-mono mr-1">#</span>
               <input type="text" value={hexInput}
                 onChange={(e) => handleHexInput(e.target.value)}
                 onBlur={handleHexBlur}
-                className="flex-1 bg-transparent text-[12px] font-mono text-white/80 outline-none border-0"
+                className="flex-1 bg-transparent text-sm text-on-surface font-mono outline-none border-0"
                 maxLength={6} />
             </div>
           </div>
-          <div className="mt-2">
-            <span className="text-[10px] text-white/18 uppercase tracking-widest block mb-1.5">History</span>
+          <div className="mt-3">
+            <span className="text-xs text-on-surface-variant uppercase tracking-wider font-medium block mb-2">History</span>
             <div className="flex gap-2">
               {colorHistory.map((c, i) => (
                 <button key={i} onClick={() => applyColor(c)}
-                  className="w-7 h-7 rounded-full border-2 transition-all hover:scale-110 active:scale-95"
+                  className="w-8 h-8 rounded-full border-2 transition-all duration-200 hover:scale-110 active:scale-95"
                   style={{
                     background: c,
-                    borderColor: displayHex.toLowerCase() === c.toLowerCase() ? '#00d4ff' : 'rgba(255,255,255,0.1)',
+                    borderColor: displayHex.toLowerCase() === c.toLowerCase() ? 'hsl(var(--primary))' : 'hsl(var(--outline-variant))',
                   }} title={c} />
               ))}
               {Array.from({ length: 5 - colorHistory.length }).map((_, i) => (
-                <div key={i} className="w-7 h-7 rounded-full"
-                  style={{ background: 'rgba(255,255,255,0.04)', border: '1.5px dashed rgba(255,255,255,0.09)' }} />
+                <div key={i} className="w-8 h-8 rounded-full border-2 border-dashed border-outline-variant bg-surface-container" />
               ))}
             </div>
           </div>
@@ -556,68 +510,61 @@ export const HaxTraceSidePanel = ({ isHidden, setIsHidden }: HaxTraceSidePanelPr
 
         {/* VISUALIZATION */}
         <Section label="Visualization">
-          <div className="space-y-2.5">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Grid3x3 className="w-3.5 h-3.5 text-white/25" />
-                <span className="text-[12px] text-white/50">Show Grid</span>
+          <div className="space-y-3">
+            <div className="flex items-center justify-between py-1">
+              <div className="flex items-center gap-2.5">
+                <Grid3x3 className="w-4 h-4 text-on-surface-variant" />
+                <span className="text-sm text-on-surface">Show Grid</span>
               </div>
-              <IOSToggle active={gridVisible} onToggle={toggleGrid} />
+              <MD3Switch active={gridVisible} onToggle={toggleGrid} />
             </div>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Magnet className="w-3.5 h-3.5 text-white/25" />
-                <span className="text-[12px] text-white/50">Snap to Grid</span>
+            <div className="flex items-center justify-between py-1">
+              <div className="flex items-center gap-2.5">
+                <Magnet className="w-4 h-4 text-on-surface-variant" />
+                <span className="text-sm text-on-surface">Snap to Grid</span>
               </div>
-              <IOSToggle active={snapToGrid} onToggle={toggleSnapToGrid} />
+              <MD3Switch active={snapToGrid} onToggle={toggleSnapToGrid} />
             </div>
           </div>
 
           {/* View Scale */}
-          <div className="mt-3 space-y-1.5">
+          <div className="mt-4 space-y-2">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-1.5">
-                <Eye className="w-3.5 h-3.5 text-white/25" />
-                <span className="text-[10px] text-white/25 uppercase tracking-widest">View Scale</span>
+                <Eye className="w-4 h-4 text-on-surface-variant" />
+                <span className="text-xs text-on-surface-variant uppercase tracking-wider font-medium">View Scale</span>
               </div>
-              <div className="flex items-center gap-1">
-                <span className="text-[11px] font-mono text-white/50">{Math.round(zoom * 100)}%</span>
-                <button onClick={() => setZoom(1)} className="text-[9px] uppercase tracking-wider text-white/20 hover:text-[#00d4ff] transition-colors ml-1">Reset</button>
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-on-surface font-mono">{Math.round(zoom * 100)}%</span>
+                <button onClick={() => setZoom(1)} className="text-xs text-primary font-medium hover:underline">Reset</button>
               </div>
             </div>
-            <div className="relative h-5 flex items-center">
-              <div className="absolute inset-x-0 h-2 rounded-full"
-                style={{ background: 'rgba(255,255,255,0.07)' }} />
-              <div className="absolute h-2 top-1/2 -translate-y-1/2 rounded-full left-0"
-                style={{
-                  width: `${((zoom - 0.1) / 4.9) * 100}%`,
-                  background: 'linear-gradient(to right, #0ea5e9, #00d4ff)',
-                }} />
+            <div className="relative h-6 flex items-center">
+              <div className="absolute inset-x-0 h-3 rounded-full bg-surface-container-highest" />
+              <div className="absolute h-3 top-1/2 -translate-y-1/2 rounded-full left-0 bg-primary"
+                style={{ width: `${((zoom - 0.1) / 4.9) * 100}%` }} />
               <input type="range" min={0.1} max={5} step={0.05} value={zoom}
                 onChange={(e) => setZoom(parseFloat(e.target.value))}
                 className="relative w-full appearance-none bg-transparent cursor-pointer z-10" />
             </div>
-            <div className="flex gap-1.5 mt-1">
+            <div className="flex gap-2 mt-2">
               <button onClick={() => setZoom(zoom / 1.25)} disabled={zoom <= 0.1}
-                className="flex-1 h-7 flex items-center justify-center rounded-lg bg-white/[0.04] text-white/30 hover:text-white hover:bg-white/10 disabled:opacity-20 transition-all"
-                style={{ border: '1px solid rgba(255,255,255,0.05)' }}>
-                <ZoomOut className="w-3.5 h-3.5" />
+                className="flex-1 h-9 flex items-center justify-center rounded-xl bg-surface-container-high text-on-surface-variant hover:bg-surface-container-highest disabled:opacity-30 transition-all duration-200">
+                <ZoomOut className="w-4 h-4" />
               </button>
               <button onClick={() => setZoom(1)}
-                className="flex-1 h-7 flex items-center justify-center rounded-lg bg-white/[0.04] text-white/30 hover:text-white hover:bg-white/10 transition-all"
-                style={{ border: '1px solid rgba(255,255,255,0.05)' }}>
-                <Maximize2 className="w-3.5 h-3.5" />
+                className="flex-1 h-9 flex items-center justify-center rounded-xl bg-surface-container-high text-on-surface-variant hover:bg-surface-container-highest transition-all duration-200">
+                <Maximize2 className="w-4 h-4" />
               </button>
               <button onClick={() => setZoom(zoom * 1.25)} disabled={zoom >= 5}
-                className="flex-1 h-7 flex items-center justify-center rounded-lg bg-white/[0.04] text-white/30 hover:text-white hover:bg-white/10 disabled:opacity-20 transition-all"
-                style={{ border: '1px solid rgba(255,255,255,0.05)' }}>
-                <ZoomIn className="w-3.5 h-3.5" />
+                className="flex-1 h-9 flex items-center justify-center rounded-xl bg-surface-container-high text-on-surface-variant hover:bg-surface-container-highest disabled:opacity-30 transition-all duration-200">
+                <ZoomIn className="w-4 h-4" />
               </button>
             </div>
           </div>
         </Section>
 
-        <div className="h-4" />
+        <div className="h-6" />
       </div>
     </div>
   );
@@ -625,8 +572,8 @@ export const HaxTraceSidePanel = ({ isHidden, setIsHidden }: HaxTraceSidePanelPr
 
 function Section({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <div className="px-4 py-3">
-      <span className="block text-[9px] font-semibold uppercase tracking-[0.2em] text-white/16 mb-3 select-none">{label}</span>
+    <div className="px-4 py-4">
+      <span className="block text-xs font-semibold uppercase tracking-wider text-on-surface-variant mb-4 select-none">{label}</span>
       {children}
     </div>
   );
@@ -635,36 +582,34 @@ function Section({ label, children }: { label: string; children: React.ReactNode
 function CollapsibleSection({ label, icon, children }: { label: string; icon?: React.ReactNode; children: React.ReactNode }) {
   const [open, setOpen] = useState(true);
   return (
-    <div className="px-4 py-3">
+    <div className="px-4 py-4">
       <button
         onClick={() => setOpen(v => !v)}
-        className="flex items-center justify-between w-full mb-3 group"
+        className="flex items-center justify-between w-full group"
       >
-        <div className="flex items-center gap-1.5">
-          {icon && <span className="text-[#00d4ff]/60">{icon}</span>}
-          <span className="text-[9px] font-semibold uppercase tracking-[0.2em] text-white/30 group-hover:text-white/50 transition-colors select-none">{label}</span>
+        <div className="flex items-center gap-2">
+          {icon && <span className="text-primary">{icon}</span>}
+          <span className="text-xs font-semibold uppercase tracking-wider text-on-surface-variant group-hover:text-on-surface transition-colors select-none">{label}</span>
         </div>
         <ChevronDown
-          className="w-3 h-3 text-white/20 group-hover:text-white/40 transition-all"
-          style={{ transform: open ? 'rotate(0deg)' : 'rotate(-90deg)', transitionDuration: '200ms' }}
+          className="w-4 h-4 text-on-surface-variant transition-all duration-200"
+          style={{ transform: open ? 'rotate(0deg)' : 'rotate(-90deg)' }}
         />
       </button>
-      {open && children}
+      {open && <div className="mt-4">{children}</div>}
     </div>
   );
 }
 
 function PanelDivider() {
-  return <div style={{ height: 1, background: 'rgba(255,255,255,0.045)', margin: '0 16px' }} />;
+  return <div className="h-px bg-outline-variant mx-4" />;
 }
 
 function NumberField({ label, value }: { label: string; value: number }) {
   return (
-    <div className="flex-1 flex items-center rounded-xl overflow-hidden"
-      style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }}>
-      <span className="px-2.5 text-[10px] text-white/25 font-semibold tracking-wider select-none"
-        style={{ borderRight: '1px solid rgba(255,255,255,0.06)' }}>{label}</span>
-      <span className="flex-1 px-2 py-1.5 text-[12px] font-mono text-white/60 text-center">{value}</span>
+    <div className="flex-1 flex items-center rounded-xl overflow-hidden bg-surface-container-high border border-outline-variant">
+      <span className="px-3 text-xs text-on-surface-variant font-semibold tracking-wider select-none border-r border-outline-variant">{label}</span>
+      <span className="flex-1 px-3 py-2 text-sm text-on-surface font-mono text-center">{value}</span>
     </div>
   );
 }
@@ -672,8 +617,8 @@ function NumberField({ label, value }: { label: string; value: number }) {
 function InfoPair({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex items-center justify-between py-0.5">
-      <span className="text-[11px] text-white/22">{label}</span>
-      <span className="text-[11px] font-mono text-white/45">{value}</span>
+      <span className="text-xs text-on-surface-variant">{label}</span>
+      <span className="text-xs text-on-surface font-mono">{value}</span>
     </div>
   );
 }

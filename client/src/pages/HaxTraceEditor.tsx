@@ -5,7 +5,7 @@ import { HaxTraceSidePanel } from '@/components/HaxTraceSidePanel';
 import { HaxTraceFloatingToolbar } from '@/components/HaxTraceFloatingToolbar';
 import { HaxTraceHelpPanel } from '@/components/HaxTraceHelpPanel';
 import { useEffect, useState } from 'react';
-import { ChevronLeft, HelpCircle, LayoutDashboard } from 'lucide-react';
+import { ChevronLeft, CircleHelp as HelpCircle, LayoutDashboard } from 'lucide-react';
 import { Link } from 'wouter';
 
 function EditorContent() {
@@ -46,50 +46,33 @@ function EditorContent() {
   }, [undo, redo, selectedVertices, selectedSegments, deleteSelectedVertices, deleteSelectedSegments]);
 
   return (
-    <div
-      className="flex h-screen overflow-hidden"
-      style={{ background: '#0b0b0b', fontFamily: "'Inter', 'Geist', 'Roboto', sans-serif" }}
-    >
+    <div className="flex h-screen overflow-hidden bg-surface">
       {/* Canvas area */}
-      <div className="flex-1 relative overflow-hidden" style={{ transition: 'width 0.25s ease' }}>
+      <div className="flex-1 relative overflow-hidden transition-all duration-300">
         <HaxTraceCanvas />
         <HaxTraceCurveEditor />
         <HaxTraceFloatingToolbar />
 
-        {/* Top-left buttons */}
+        {/* Top-left buttons - MD3 FAB style */}
         <div className="absolute top-4 left-4 z-40 flex items-center gap-2">
           <Link href="/">
             <button
               title="Dashboard"
-              className="w-8 h-8 flex items-center justify-center rounded-full transition-all hover:scale-105"
-              style={{
-                background: 'rgba(14,14,16,0.82)',
-                backdropFilter: 'blur(16px)',
-                WebkitBackdropFilter: 'blur(16px)',
-                border: '1px solid rgba(255,255,255,0.07)',
-                boxShadow: '0 4px 20px rgba(0,0,0,0.5)',
-                color: 'rgba(255,255,255,0.4)',
-              }}
-              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = 'white'; (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.18)'; }}
-              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.4)'; (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.07)'; }}
+              className="w-11 h-11 flex items-center justify-center rounded-full bg-surface-container-high text-on-surface-variant border border-outline-variant shadow-lg hover:bg-surface-container-highest hover:text-on-surface hover:border-outline transition-all duration-200"
             >
-              <LayoutDashboard className="w-4 h-4" />
+              <LayoutDashboard className="w-5 h-5" />
             </button>
           </Link>
           <button
             onClick={() => setHelpOpen(v => !v)}
             title="Help, shortcuts & info"
-            className="w-8 h-8 flex items-center justify-center rounded-full transition-all hover:scale-105"
-            style={{
-              background: helpOpen ? 'rgba(0,212,255,0.18)' : 'rgba(14,14,16,0.82)',
-              backdropFilter: 'blur(16px)',
-              WebkitBackdropFilter: 'blur(16px)',
-              border: helpOpen ? '1px solid rgba(0,212,255,0.35)' : '1px solid rgba(255,255,255,0.07)',
-              boxShadow: '0 4px 20px rgba(0,0,0,0.5)',
-              color: helpOpen ? '#00d4ff' : 'rgba(255,255,255,0.4)',
-            }}
+            className={`w-11 h-11 flex items-center justify-center rounded-full shadow-lg transition-all duration-200 ${
+              helpOpen
+                ? 'bg-primary-container text-on-primary-container border border-primary'
+                : 'bg-surface-container-high text-on-surface-variant border border-outline-variant hover:bg-surface-container-highest hover:text-on-surface'
+            }`}
           >
-            <HelpCircle className="w-4 h-4" />
+            <HelpCircle className="w-5 h-5" />
           </button>
         </div>
 
@@ -97,43 +80,22 @@ function EditorContent() {
 
         {/* Mini-HUD — appears only when panel is hidden */}
         {panelHidden && (
-          <div
-            className="absolute top-4 right-4 z-40 flex items-center gap-2"
-            style={{ pointerEvents: 'auto' }}
-          >
-            <div
-              className="flex items-center gap-2 px-3 py-1.5 rounded-full"
-              style={{
-                background: 'rgba(14,14,16,0.82)',
-                backdropFilter: 'blur(16px)',
-                WebkitBackdropFilter: 'blur(16px)',
-                border: '1px solid rgba(255,255,255,0.07)',
-                boxShadow: '0 4px 20px rgba(0,0,0,0.5)',
-                pointerEvents: 'none',
-              }}
-            >
-              <span className="text-[11px] text-white/35 tabular-nums select-none">
-                V:&nbsp;<span className="text-white/65 font-semibold">{map.vertexes.length}</span>
+          <div className="absolute top-4 right-4 z-40 flex items-center gap-2">
+            <div className="flex items-center gap-3 px-4 py-2 rounded-full bg-surface-container-high border border-outline-variant shadow-lg">
+              <span className="text-xs text-on-surface-variant tabular-nums select-none">
+                V:&nbsp;<span className="text-on-surface font-semibold">{map.vertexes.length}</span>
               </span>
-              <span className="text-white/12">|</span>
-              <span className="text-[11px] text-white/35 tabular-nums select-none">
-                S:&nbsp;<span className="text-white/65 font-semibold">{map.segments.length}</span>
+              <span className="text-outline-variant">|</span>
+              <span className="text-xs text-on-surface-variant tabular-nums select-none">
+                S:&nbsp;<span className="text-on-surface font-semibold">{map.segments.length}</span>
               </span>
             </div>
             <button
               onClick={() => setPanelHidden(false)}
-              className="w-8 h-8 flex items-center justify-center rounded-full transition-all hover:scale-105"
-              style={{
-                background: 'rgba(14,14,16,0.82)',
-                backdropFilter: 'blur(16px)',
-                WebkitBackdropFilter: 'blur(16px)',
-                border: '1px solid rgba(255,255,255,0.07)',
-                boxShadow: '0 4px 20px rgba(0,0,0,0.5)',
-                color: 'rgba(255,255,255,0.4)',
-              }}
+              className="w-11 h-11 flex items-center justify-center rounded-full bg-surface-container-high text-on-surface-variant border border-outline-variant shadow-lg hover:bg-surface-container-highest hover:text-on-surface transition-all duration-200"
               title="Show properties panel"
             >
-              <ChevronLeft className="w-4 h-4" />
+              <ChevronLeft className="w-5 h-5" />
             </button>
           </div>
         )}
@@ -141,12 +103,8 @@ function EditorContent() {
 
       {/* Right panel with smooth transition */}
       <div
-        style={{
-          flexShrink: 0,
-          width: panelHidden ? 0 : 280,
-          overflow: 'hidden',
-          transition: 'width 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
-        }}
+        className="flex-shrink-0 overflow-hidden transition-all duration-300 ease-out"
+        style={{ width: panelHidden ? 0 : 300 }}
       >
         <HaxTraceSidePanel isHidden={panelHidden} setIsHidden={setPanelHidden} />
       </div>

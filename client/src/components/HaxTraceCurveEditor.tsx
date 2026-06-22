@@ -59,13 +59,13 @@ function SBCanvas({ hue, sat, val, onChange }: { hue:number; sat:number; val:num
   },[onChange]);
 
   return (
-    <div className="relative rounded-lg overflow-hidden" style={{height:110}}>
+    <div className="relative rounded-2xl overflow-hidden" style={{height:110}}>
       <canvas ref={ref} width={248} height={110} className="w-full h-full cursor-crosshair block"
         onMouseDown={e=>{ drag.current=true; pos(e); }} />
       <div className="absolute pointer-events-none" style={{
         left:`${sat*100}%`, top:`${(1-val)*100}%`,
-        transform:'translate(-50%,-50%)', width:11, height:11,
-        borderRadius:'50%', border:'2px solid #fff', boxShadow:'0 0 0 1px rgba(0,0,0,0.45)'
+        transform:'translate(-50%,-50%)', width:14, height:14,
+        borderRadius:'50%', border:'3px solid white', boxShadow:'0 0 0 2px rgba(0,0,0,0.3)'
       }}/>
     </div>
   );
@@ -90,18 +90,18 @@ function ArcPreview({ value, type, chord }: { value: number; type: string; chord
     else if (type==='sagitta') angleDeg = isFinite(sagittaToAngle(value,chord)) ? sagittaToAngle(value,chord) : 0;
     if (Math.abs(angleDeg) < 0.5) return;
     const bulge = (Math.abs(angleDeg) / 180) * H * 0.38 * (angleDeg > 0 ? -1 : 1);
-    ctx.strokeStyle='#00d4ff'; ctx.lineWidth=2; ctx.setLineDash([]);
+    ctx.strokeStyle='hsl(var(--primary))'; ctx.lineWidth=2; ctx.setLineDash([]);
     ctx.beginPath();
     ctx.moveTo(x0,y);
     ctx.quadraticCurveTo((x0+x1)/2, y+bulge, x1, y);
     ctx.stroke();
     [x0,x1].forEach(px => {
       ctx.beginPath(); ctx.arc(px,y,3,0,Math.PI*2);
-      ctx.fillStyle='rgba(0,212,255,0.6)'; ctx.fill();
+      ctx.fillStyle='hsl(var(--primary) / 0.6)'; ctx.fill();
     });
   }, [value, type, chord]);
 
-  return <canvas ref={ref} width={248} height={44} className="w-full rounded-lg" style={{background:'rgba(0,0,0,0.3)',display:'block'}}/>;
+  return <canvas ref={ref} width={248} height={44} className="w-full rounded-2xl bg-surface-container-highest block" />;
 }
 
 /* ── Main component ──────────────────────────────────────────── */
@@ -200,54 +200,42 @@ export const HaxTraceCurveEditor = () => {
   return (
     <div
       ref={cardRef}
-      className="fixed z-50 select-none"
-      style={{
-        left: panelPos.x, top: panelPos.y,
-        width: 280,
-        background: 'rgba(12,12,14,0.90)',
-        backdropFilter: 'blur(28px)',
-        WebkitBackdropFilter: 'blur(28px)',
-        borderRadius: 20,
-        border: '1px solid rgba(255,255,255,0.07)',
-        boxShadow: '0 24px 64px rgba(0,0,0,0.75), 0 0 0 0.5px rgba(255,255,255,0.04) inset',
-      }}
+      className="fixed z-50 select-none w-[300px] bg-surface-container rounded-3xl border border-outline-variant shadow-xl"
+      style={{ left: panelPos.x, top: panelPos.y }}
       data-testid="card-curve-editor"
     >
       {/* Header */}
       <div
-        className="flex items-center justify-between px-4 py-3 cursor-move"
-        style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}
+        className="flex items-center justify-between px-5 py-4 cursor-move border-b border-outline-variant"
         onMouseDown={onDragStart}
       >
         <div className="flex items-center gap-2">
-          <GripVertical className="w-3.5 h-3.5 text-white/20" />
-          <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-white/35 select-none">Segment Editor</span>
+          <GripVertical className="w-4 h-4 text-on-surface-variant" />
+          <span className="text-xs font-semibold uppercase tracking-wider text-on-surface-variant select-none">Segment Editor</span>
         </div>
         <div className="flex items-center gap-1.5">
-          <div className="flex items-center px-2 py-0.5 rounded-full"
-            style={{background:'rgba(0,212,255,0.10)',border:'1px solid rgba(0,212,255,0.25)'}}>
-            <span className="text-[9px] text-[#00d4ff]/70 font-mono">SEG {isMulti ? `${segIdx}…` : segIdx}</span>
+          <div className="flex items-center px-2.5 py-1 rounded-full bg-primary-container">
+            <span className="text-[10px] text-on-primary-container font-mono font-medium">SEG {isMulti ? `${segIdx}…` : segIdx}</span>
           </div>
         </div>
       </div>
 
-      <div className="px-4 py-3 space-y-4">
+      <div className="px-5 py-4 space-y-4">
 
         {/* ── Arc Preview ── */}
         <ArcPreview value={display} type={curveData.type} chord={chord} />
 
         {/* ── Curve Type tabs ── */}
         <div>
-          <span className="text-[9px] text-white/22 uppercase tracking-widest block mb-1.5">Curve Type</span>
-          <div className="flex gap-1.5 p-1 rounded-xl"
-            style={{background:'rgba(255,255,255,0.04)',border:'1px solid rgba(255,255,255,0.06)'}}>
+          <span className="text-xs text-on-surface-variant uppercase tracking-wider font-medium block mb-2">Curve Type</span>
+          <div className="flex gap-1.5 p-1 rounded-2xl bg-surface-container-high">
             {(['angle','radius','sagitta'] as const).map(t => (
               <button key={t} onClick={() => handleTypeChange(t)}
-                className="flex-1 h-7 rounded-lg text-[11px] font-medium capitalize transition-all"
-                style={curveData.type===t ? {
-                  background:'rgba(0,212,255,0.18)', color:'#00d4ff',
-                  boxShadow:'0 0 12px rgba(0,212,255,0.3)', border:'1px solid rgba(0,212,255,0.35)'
-                } : { color:'rgba(255,255,255,0.35)', border:'1px solid transparent' }}>
+                className={`flex-1 h-9 rounded-xl text-xs font-medium capitalize transition-all duration-200 ${
+                  curveData.type === t
+                    ? 'bg-primary-container text-on-primary-container'
+                    : 'text-on-surface-variant hover:bg-surface-container-highest'
+                }`}>
                 {t}
               </button>
             ))}
@@ -256,67 +244,61 @@ export const HaxTraceCurveEditor = () => {
 
         {/* ── Curve Value slider ── */}
         <div>
-          <div className="flex justify-between items-center mb-1.5">
-            <span className="text-[9px] text-white/22 uppercase tracking-widest">
+          <div className="flex justify-between items-center mb-2">
+            <span className="text-xs text-on-surface-variant uppercase tracking-wider font-medium">
               {curveData.type==='angle' ? 'Angle' : curveData.type==='radius' ? 'Radius' : 'Sagitta'}
             </span>
             <input
               type="number" value={display}
               onChange={e => handleValue(Number(e.target.value))}
               step={cfg.step}
-              className="w-20 text-right text-[12px] font-mono bg-transparent border-0 outline-none text-white/65"
+              className="w-24 text-right text-sm text-on-surface font-mono bg-transparent border-0 outline-none"
             />
           </div>
-          <div className="relative h-5 flex items-center">
-            <div className="absolute inset-x-0 h-1.5 rounded-full" style={{background:'rgba(255,255,255,0.07)'}}/>
+          <div className="relative h-6 flex items-center">
+            <div className="absolute inset-x-0 h-3 rounded-full bg-surface-container-highest" />
             <input type="range" min={cfg.min} max={cfg.max} step={cfg.step}
               value={isFinite(curveData.value) ? curveData.value : 0}
               onChange={e => handleValue(parseFloat(e.target.value))}
               className="relative w-full appearance-none bg-transparent cursor-pointer z-10"
-              style={{height:20}}
+              style={{height:24}}
               data-testid="slider-curve-editor"
             />
-          </div>
-          <div className="flex justify-between mt-0.5">
-            <span className="text-[9px] text-white/18 font-mono">{cfg.min}</span>
-            <span className="text-[9px] text-white/18 font-mono">{cfg.max}</span>
           </div>
         </div>
 
         {/* ── Stats ── */}
         <div className="flex gap-2">
           {[['Chord', `${Math.round(chord)}px`], ['Direction', direction]].map(([l,v]) => (
-            <div key={l} className="flex-1 rounded-xl px-2.5 py-2 space-y-0.5"
-              style={{background:'rgba(255,255,255,0.03)',border:'1px solid rgba(255,255,255,0.05)'}}>
-              <span className="block text-[9px] text-white/22 uppercase tracking-wider">{l}</span>
-              <span className="block text-[11px] font-mono text-white/60">{v}</span>
+            <div key={l} className="flex-1 rounded-2xl px-4 py-3 bg-surface-container-high space-y-0.5">
+              <span className="block text-[10px] text-on-surface-variant uppercase tracking-wider font-medium">{l}</span>
+              <span className="block text-sm text-on-surface font-mono">{v}</span>
             </div>
           ))}
         </div>
 
-        <div style={{height:1,background:'rgba(255,255,255,0.05)'}}/>
+        <div className="h-px bg-outline-variant" />
 
         {/* ── Colour Picker ── */}
         <div>
-          <span className="text-[9px] text-white/22 uppercase tracking-widest block mb-2">Segment Color</span>
+          <span className="text-xs text-on-surface-variant uppercase tracking-wider font-medium block mb-2">Segment Color</span>
           <SBCanvas hue={hsv[0]} sat={hsv[1]} val={hsv[2]}
             onChange={(s,v) => { setHsv([hsv[0],s,v]); applyColor(hsv[0],s,v); }} />
 
           {/* Hue slider */}
-          <div className="mt-2 relative h-4 flex items-center">
-            <div className="absolute inset-x-0 h-2 rounded-full"
+          <div className="mt-3 relative h-6 flex items-center">
+            <div className="absolute inset-x-0 h-3 rounded-full"
               style={{background:'linear-gradient(to right,#f00,#ff0,#0f0,#0ff,#00f,#f0f,#f00)'}}/>
             <input type="range" min={0} max={360} step={1} value={hsv[0]}
               onChange={e => { const h=parseFloat(e.target.value); setHsv([h,hsv[1],hsv[2]]); applyColor(h,hsv[1],hsv[2]); }}
-              className="relative w-full appearance-none bg-transparent cursor-pointer z-10" style={{height:16}}/>
+              className="relative w-full appearance-none bg-transparent cursor-pointer z-10" style={{height:24}}/>
           </div>
 
           {/* Hex + swatch */}
-          <div className="flex items-center gap-2 mt-2">
-            <div className="w-8 h-8 rounded-lg flex-shrink-0 border border-white/10" style={{background:displayColor}}/>
-            <div className="flex items-center flex-1 rounded-xl px-2.5 h-8"
-              style={{background:'rgba(255,255,255,0.05)',border:'1px solid rgba(255,255,255,0.07)'}}>
-              <span className="text-[11px] text-white/25 font-mono mr-1">#</span>
+          <div className="flex items-center gap-3 mt-3">
+            <div className="w-10 h-10 rounded-2xl flex-shrink-0 border-2 border-outline-variant" style={{background:displayColor}}/>
+            <div className="flex items-center flex-1 rounded-xl px-3 h-10 bg-surface-container-high border border-outline-variant">
+              <span className="text-xs text-on-surface-variant font-mono mr-1">#</span>
               <input type="text" value={hexIn} maxLength={6}
                 onChange={e => {
                   const clean = e.target.value.replace(/[^0-9A-Fa-f]/g,'').slice(0,6);
@@ -327,7 +309,7 @@ export const HaxTraceCurveEditor = () => {
                     applyColor(h[0],h[1],h[2]);
                   }
                 }}
-                className="flex-1 bg-transparent text-[12px] font-mono text-white/75 outline-none border-0"/>
+                className="flex-1 bg-transparent text-sm text-on-surface font-mono outline-none border-0"/>
             </div>
           </div>
         </div>
