@@ -77,8 +77,17 @@ export class CanvasRenderer {
 
   clear(bgColor: string = '#1a1a1a') {
     const rect = this.canvas.getBoundingClientRect();
-    const normalizedColor = bgColor.startsWith('#') ? bgColor : `#${bgColor}`;
-    this.ctx.fillStyle = normalizedColor;
+    // Handle 8-character hex (with alpha) and convert to rgba
+    let color = bgColor.startsWith('#') ? bgColor : `#${bgColor}`;
+    if (color.length === 9) {
+      // Convert #RRGGBBAA to rgba
+      const r = parseInt(color.slice(1, 3), 16);
+      const g = parseInt(color.slice(3, 5), 16);
+      const b = parseInt(color.slice(5, 7), 16);
+      const a = parseInt(color.slice(7, 9), 16) / 255;
+      color = `rgba(${r}, ${g}, ${b}, ${a})`;
+    }
+    this.ctx.fillStyle = color;
     this.ctx.fillRect(0, 0, rect.width, rect.height);
   }
 

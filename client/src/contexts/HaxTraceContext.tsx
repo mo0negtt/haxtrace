@@ -102,7 +102,7 @@ const defaultMap: HaxMap = {
   name: 'HaxTrace',
   width: 400,
   height: 200,
-  bg: { color: '000000ff' },
+  bg: { color: '141416ff' },
   vertexes: [
   ],
   segments: [
