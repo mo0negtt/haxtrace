@@ -460,6 +460,13 @@ export const HaxTraceCanvas = () => {
     }
 
     if (e.button === 0) {
+      // Marquee selection with shift+drag for all tools
+      if (e.shiftKey) {
+        setMarqueeStart({ x, y });
+        setMarqueeCurrent({ x, y });
+        return;
+      }
+
       if (vertexIndex !== null && isCtrlPressed) {
         selectVertex(vertexIndex, true);
         return;
@@ -481,7 +488,7 @@ export const HaxTraceCanvas = () => {
 
       if (currentTool === 'vertex') {
         if (vertexIndex !== null) {
-          const multiSelect = e.shiftKey || isCtrlPressed;
+          const multiSelect = isCtrlPressed;
           selectVertex(vertexIndex, multiSelect);
           if (!multiSelect) {
             setIsDraggingVertex(vertexIndex);
@@ -497,8 +504,8 @@ export const HaxTraceCanvas = () => {
           }
           return;
         }
-        
-        if (!e.shiftKey && !isCtrlPressed) {
+
+        if (!isCtrlPressed) {
           const world = renderer.screenToWorld(x, y);
           const sx = snapCoord(world.x), sy = snapCoord(world.y);
           if (mirrorMode) {
@@ -507,9 +514,6 @@ export const HaxTraceCanvas = () => {
             addVertex(sx, sy);
           }
           clearVertexSelection();
-        } else {
-          setMarqueeStart({ x, y });
-          setMarqueeCurrent({ x, y });
         }
         return;
       }
@@ -521,8 +525,8 @@ export const HaxTraceCanvas = () => {
         }
 
         if (segmentIndex !== null) {
-          selectSegment(segmentIndex, e.shiftKey || isCtrlPressed);
-        } else if (!e.shiftKey && !isCtrlPressed) {
+          selectSegment(segmentIndex, isCtrlPressed);
+        } else if (!isCtrlPressed) {
           clearSegmentSelection();
         }
       }
