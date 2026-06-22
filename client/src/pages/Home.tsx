@@ -55,6 +55,7 @@ function timeAgo(iso: string): string {
 }
 
 const VERSION_LOGS = [
+  { badge: "NUEVO" as const, version: "2.7.0", text: "Interfaz rediseñada con Material Design 3. Polyline ahora permite seleccionar segmentos con clic derecho." },
   { badge: "NUEVO" as const, version: "2.6.0", text: "Añadidas Smart Guides y Mirror Mode al editor." },
   { badge: "NUEVO" as const, version: "2.5.0", text: "Curve Editor con soporte multi-segmento (Angle, Radius, Sagitta)." },
   { badge: "FIX" as const, version: "2.4.2", text: "Corregido error en la exportación de polígonos complejos." },
@@ -62,7 +63,6 @@ const VERSION_LOGS = [
   { badge: "FIX" as const, version: "2.3.1", text: "Arreglado bug de undo/redo en selecciones múltiples." },
   { badge: "NUEVO" as const, version: "2.3.0", text: "Background Image: soporte para lock, offset y escala." },
   { badge: "INFO" as const, version: "2.2.0", text: "Panel de propiedades rediseñado con Material Design 3." },
-  { badge: "FIX" as const, version: "2.1.3", text: "Corregido crash al importar archivos .hbs malformados." },
 ];
 
 function BadgePill({ type }: { type: "NUEVO" | "FIX" | "INFO" }) {

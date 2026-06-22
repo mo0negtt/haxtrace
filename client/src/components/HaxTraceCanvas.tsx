@@ -411,8 +411,17 @@ export const HaxTraceCanvas = () => {
     const isCtrlPressed = e.ctrlKey || e.metaKey;
     
     if (e.button === 2) {
-      // Polyline / Ortho: right-click = cut the thread (end the chain, no context menu)
+      // Polyline / Ortho: right-click behavior
       if (currentTool === 'polyline' || currentTool === 'ortho') {
+        // Check if clicking on a segment first
+        const segmentIndex = renderer.getSegmentAt(x, y, map.segments, map.vertexes);
+        if (segmentIndex !== null) {
+          // Select the segment (with Ctrl for multi-select)
+          selectSegment(segmentIndex, isCtrlPressed);
+          setContextMenuTarget({ type: 'segment', index: segmentIndex });
+          return;
+        }
+        // Otherwise, end the polyline chain
         if (polylineAnchorVertex !== null) {
           setPolylineAnchorVertex(null);
           setMirrorPolylineAnchorVertex(null);
@@ -439,13 +448,13 @@ export const HaxTraceCanvas = () => {
         }
         return;
       }
-      
+
       const segmentIndex = renderer.getSegmentAt(x, y, map.segments, map.vertexes);
       if (segmentIndex !== null) {
         setContextMenuTarget({ type: 'segment', index: segmentIndex });
         return;
       }
-      
+
       setContextMenuTarget(null);
       return;
     }
@@ -735,20 +744,33 @@ export const HaxTraceCanvas = () => {
     e.preventDefault();
   }, []);
 
-  // Suppress the native (and Radix) context menu entirely when polyline/ortho is active
-  // by intercepting in the capture phase before Radix's listener fires.
+  // Allow context menu only when right-clicking on segments in polyline mode
+  // Otherwise suppress for ending polyline chain
   useEffect(() => {
     const el = canvasRef.current;
     if (!el) return;
     const suppress = (e: MouseEvent) => {
       if (currentTool === 'polyline' || currentTool === 'ortho') {
+        // Check if we're over a segment - if so, allow context menu
+        const rect = el.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        const renderer = rendererRef.current;
+        if (renderer) {
+          const segmentIndex = renderer.getSegmentAt(x, y, map.segments, map.vertexes);
+          if (segmentIndex !== null) {
+            // Allow context menu for segment selection
+            return;
+          }
+        }
+        // Not over a segment - suppress context menu and end polyline
         e.preventDefault();
         e.stopImmediatePropagation();
       }
     };
     el.addEventListener('contextmenu', suppress, { capture: true });
     return () => el.removeEventListener('contextmenu', suppress, { capture: true });
-  }, [currentTool]);
+  }, [currentTool, map.segments, map.vertexes]);
 
   const handleWheel = useCallback((e: React.WheelEvent) => {
     e.preventDefault();
@@ -852,23 +874,23 @@ export const HaxTraceCanvas = () => {
                 setContextMenuTarget(null);
               }}
             >
-              <Copy className="w-4 h-4 mr-2" />
-              Duplicate Vertex
+              <Copy className="w-4 h-4 text-on-surface-variant" />
+              <span>Duplicate Vertex</span>
             </ContextMenuItem>
             {selectedVertices.length > 1 && (
               <ContextMenuSub>
                 <ContextMenuSubTrigger>
-                  <FlipHorizontal2 className="w-4 h-4 mr-2" />
-                  Mirror Selection
+                  <FlipHorizontal2 className="w-4 h-4 text-on-surface-variant" />
+                  <span>Mirror Selection</span>
                 </ContextMenuSubTrigger>
                 <ContextMenuSubContent>
                   <ContextMenuItem onClick={() => { mirrorSelectedVertices('x'); setContextMenuTarget(null); }}>
-                    <FlipHorizontal2 className="w-4 h-4 mr-2" />
-                    Mirror Horizontal (X)
+                    <FlipHorizontal2 className="w-4 h-4 text-on-surface-variant" />
+                    <span>Horizontal (X)</span>
                   </ContextMenuItem>
                   <ContextMenuItem onClick={() => { mirrorSelectedVertices('y'); setContextMenuTarget(null); }}>
-                    <FlipVertical2 className="w-4 h-4 mr-2" />
-                    Mirror Vertical (Y)
+                    <FlipVertical2 className="w-4 h-4 text-on-surface-variant" />
+                    <span>Vertical (Y)</span>
                   </ContextMenuItem>
                 </ContextMenuSubContent>
               </ContextMenuSub>
@@ -880,10 +902,10 @@ export const HaxTraceCanvas = () => {
                 deleteVertex(contextMenuTarget.index);
                 setContextMenuTarget(null);
               }}
-              className="text-destructive"
+              className="text-error focus:bg-error-container focus:text-on-error-container"
             >
-              <Trash2 className="w-4 h-4 mr-2" />
-              Delete Vertex
+              <Trash2 className="w-4 h-4" />
+              <span>Delete Vertex</span>
             </ContextMenuItem>
           </>
         )}
@@ -898,23 +920,23 @@ export const HaxTraceCanvas = () => {
                 setContextMenuTarget(null);
               }}
             >
-              <Copy className="w-4 h-4 mr-2" />
-              Duplicate Segment
+              <Copy className="w-4 h-4 text-on-surface-variant" />
+              <span>Duplicate Segment</span>
             </ContextMenuItem>
-            {selectedSegments.length > 0 && (
+            {(selectedSegments.length > 0 || (currentTool === 'polyline' || currentTool === 'ortho')) && (
               <ContextMenuSub>
                 <ContextMenuSubTrigger>
-                  <FlipHorizontal2 className="w-4 h-4 mr-2" />
-                  Mirror Segments
+                  <FlipHorizontal2 className="w-4 h-4 text-on-surface-variant" />
+                  <span>Mirror Segments</span>
                 </ContextMenuSubTrigger>
                 <ContextMenuSubContent>
                   <ContextMenuItem onClick={() => { mirrorSelectedSegments('x'); setContextMenuTarget(null); }}>
-                    <FlipHorizontal2 className="w-4 h-4 mr-2" />
-                    Mirror Horizontal (X)
+                    <FlipHorizontal2 className="w-4 h-4 text-on-surface-variant" />
+                    <span>Horizontal (X)</span>
                   </ContextMenuItem>
                   <ContextMenuItem onClick={() => { mirrorSelectedSegments('y'); setContextMenuTarget(null); }}>
-                    <FlipVertical2 className="w-4 h-4 mr-2" />
-                    Mirror Vertical (Y)
+                    <FlipVertical2 className="w-4 h-4 text-on-surface-variant" />
+                    <span>Vertical (Y)</span>
                   </ContextMenuItem>
                 </ContextMenuSubContent>
               </ContextMenuSub>
@@ -929,16 +951,16 @@ export const HaxTraceCanvas = () => {
                 deleteSelectedSegments();
                 setContextMenuTarget(null);
               }}
-              className="text-destructive"
+              className="text-error focus:bg-error-container focus:text-on-error-container"
             >
-              <Trash2 className="w-4 h-4 mr-2" />
-              Delete Segment
+              <Trash2 className="w-4 h-4" />
+              <span>Delete Segment</span>
             </ContextMenuItem>
           </>
         )}
 
         {!contextMenuTarget && currentTool !== 'polyline' && currentTool !== 'ortho' && (
-          <ContextMenuItem disabled>No selection</ContextMenuItem>
+          <div className="px-3 py-2.5 text-sm text-on-surface-variant/50">No selection</div>
         )}
       </ContextMenuContent>
     </ContextMenu>
