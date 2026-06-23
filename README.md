@@ -129,6 +129,7 @@ Recomendado en escritorio — el trazado de precisión depende de mouse + teclad
 - [x] Omni-Selection (marquee)
 - [x] Atajos de teclado profesionales
 - [ ] Rediseño a la interfaz
+- [ ] Hacer una té
 
 ---
 
