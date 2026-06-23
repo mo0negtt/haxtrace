@@ -460,8 +460,18 @@ export const HaxTraceCanvas = () => {
     }
 
     if (e.button === 0) {
-      // Marquee selection with shift+drag for all tools
+      const segmentIndex = renderer.getSegmentAt(x, y, map.segments, map.vertexes);
+
+      // Shift: toggle-select vertex/segment, or start marquee on empty space
       if (e.shiftKey) {
+        if (vertexIndex !== null) {
+          selectVertex(vertexIndex, true);
+          return;
+        }
+        if (segmentIndex !== null) {
+          selectSegment(segmentIndex, true);
+          return;
+        }
         setMarqueeStart({ x, y });
         setMarqueeCurrent({ x, y });
         return;
@@ -472,7 +482,6 @@ export const HaxTraceCanvas = () => {
         return;
       }
 
-      const segmentIndex = renderer.getSegmentAt(x, y, map.segments, map.vertexes);
       if (segmentIndex !== null && isCtrlPressed) {
         selectSegment(segmentIndex, true);
         return;
