@@ -472,6 +472,7 @@ export const HaxTraceCanvas = () => {
           selectSegment(segmentIndex, true);
           return;
         }
+        setPolylineMouseScreen(null);
         setMarqueeStart({ x, y });
         setMarqueeCurrent({ x, y });
         return;
@@ -603,7 +604,7 @@ export const HaxTraceCanvas = () => {
       return;
     }
 
-    if (currentTool === 'polyline' || currentTool === 'ortho') {
+    if ((currentTool === 'polyline' || currentTool === 'ortho') && !marqueeStart) {
       let polyScreenX = x, polyScreenY = y;
       let resolvedWorldX = Math.round(world.x);
       let resolvedWorldY = Math.round(world.y);
