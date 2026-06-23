@@ -1,6 +1,4 @@
-<img width="1365" height="699" alt="image" src="https://github.com/user-attachments/assets/4fb3cd14-c8c9-4754-9ec9-a57ba4655e8f" /><div align="center">
-
-<img width="330" height="330" alt="haxtrace" src="https://github.com/user-attachments/assets/92c5c663-6b72-4ee4-8c3e-3abb65ecbb7a" />
+<img width="1365" height="699" alt="image" src="https://github.com/user-attachments/assets/4fb3cd14-c8c9-4754-9ec9-a57ba4655e8f" />
 
 # HaxTrace
 ### Vectoriza imagenes para Haxball
