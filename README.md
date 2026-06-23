@@ -11,15 +11,10 @@
 <br/>
 
 [![Version](https://img.shields.io/badge/version-2.7.0-00d4ff?style=for-the-badge&labelColor=0d1117)](https://github.com/mo0negtt/HaxTrace/releases)
-<br/>
 [![Editor en vivo](https://img.shields.io/badge/Editor-en%20vivo-00d4ff?style=for-the-badge&logo=googlechrome&logoColor=white&labelColor=0d1117)](https://haxtrace.pages.dev/editor)
-<br/>
 [![License](https://img.shields.io/badge/license-MIT-00d4ff?style=for-the-badge&labelColor=0d1117)](LICENSE)
-<br/>
 [![TikTok](https://img.shields.io/badge/TikTok-000000?style=for-the-badge&logo=tiktok&logoColor=white&labelColor=0d1117)](https://www.tiktok.com/@mo0negtt)
-<br/>
 [![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white&labelColor=0d1117)](https://www.typescriptlang.org/)
-<br/>
 
 [**Editor**](#editor) · [**Funciones**](#funciones) · [**Flujo de trabajo**](#flujo) · [**Atajos**](#atajos) · [**FAQ**](#faq)
 
