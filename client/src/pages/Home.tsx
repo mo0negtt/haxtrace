@@ -173,9 +173,9 @@ export default function Home() {
         {/* Logo */}
         <div className="flex items-center gap-2.5 flex-shrink-0">
           <img
-            src="/haxtrace.png"
+            src="/haxtrace-icon.png"
             alt="HaxTrace"
-            className="w-8 h-8 object-contain rounded-xl overflow-hidden"
+            className="w-8 h-8 object-cover rounded-xl"
           />
           <span className="font-bold text-lg tracking-tight text-on-surface">
             Hax<span className="text-primary">Trace</span>
