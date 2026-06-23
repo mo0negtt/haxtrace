@@ -1,4 +1,5 @@
-<img width="1365" height="699" alt="image" src="https://github.com/user-attachments/assets/4fb3cd14-c8c9-4754-9ec9-a57ba4655e8f" />
+<div align="center">
+<img width="169" height="169" alt="HaxTrace logo" src="https://github.com/user-attachments/assets/83b7f8ae-7183-46c7-8f47-19bb696b21c1" />
 
 # HaxTrace
 ### Vectoriza imagenes para Haxball
