@@ -171,15 +171,12 @@ export default function Home() {
       {/* HEADER + TABS */}
       <header className="flex-shrink-0 flex items-center px-8 py-3 bg-surface border-b border-outline-variant">
         {/* Logo */}
-        <div className="flex items-center gap-2.5 flex-shrink-0">
+        <div className="flex-shrink-0">
           <img
             src="/haxtrace-icon.png"
             alt="HaxTrace"
-            className="w-8 h-8 object-cover rounded-xl"
+            className="h-9 w-auto object-contain"
           />
-          <span className="font-bold text-lg tracking-tight text-on-surface">
-            Hax<span className="text-primary">Trace</span>
-          </span>
         </div>
 
         {/* Center: Tabs (MD3 Segmented Button style) */}
