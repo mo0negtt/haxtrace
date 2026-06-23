@@ -1,80 +1,148 @@
-<div align="center">
+<img width="1365" height="699" alt="image" src="https://github.com/user-attachments/assets/4fb3cd14-c8c9-4754-9ec9-a57ba4655e8f" /><div align="center">
 
-<img width="169" height="169" alt="favicon" src="https://github.com/user-attachments/assets/05b752c9-0da8-4d83-b0b1-15a7f5eb8a80" />
+<img width="330" height="330" alt="haxtrace" src="https://github.com/user-attachments/assets/92c5c663-6b72-4ee4-8c3e-3abb65ecbb7a" />
 
 # HaxTrace
-
-### Vectoriza tus logos para Haxball
-
-<br/>
-
-[![Version](https://img.shields.io/badge/version-2.6.0-00d4ff?style=for-the-badge&labelColor=0d1117)](https://github.com/mo0negtt/HaxTrace/releases)
+### Vectoriza imagenes para Haxball
 
 <br/>
 
+[![Version](https://img.shields.io/badge/version-2.7.0-00d4ff?style=for-the-badge&labelColor=0d1117)](https://github.com/mo0negtt/HaxTrace/releases)
+<br/>
+[![Editor en vivo](https://img.shields.io/badge/Editor-en%20vivo-00d4ff?style=for-the-badge&logo=googlechrome&logoColor=white&labelColor=0d1117)](https://haxtrace.pages.dev/editor)
+<br/>
+[![License](https://img.shields.io/badge/license-MIT-00d4ff?style=for-the-badge&labelColor=0d1117)](LICENSE)
+<br/>
 [![TikTok](https://img.shields.io/badge/TikTok-000000?style=for-the-badge&logo=tiktok&logoColor=white&labelColor=0d1117)](https://www.tiktok.com/@mo0negtt)
-
+<br/>
+[![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white&labelColor=0d1117)](https://www.typescriptlang.org/)
 <br/>
 
-[**Editor**](#editor-features) · [**Smart Guides**](#precision) · [**FAQ**](#faq)
+[**Editor**](#editor) · [**Funciones**](#funciones) · [**Flujo de trabajo**](#flujo) · [**Atajos**](#atajos) · [**FAQ**](#faq)
 
 </div>
 
 > [!TIP]
-> **HaxTrace** está optimizado para flujos de trabajo de mapeo y profesional. Utiliza el **Snap-to-Grid** y las **Smart Guides** para lograr una geometría perfecta en tus mapas de Haxball.
+> **HaxTrace** está pensado para mappers que necesitan geometría perfecta. Usa **Snap-to-Grid** y las **Smart Guides** para alinear cada vértice sin perder precisión.
 
 ---
 
 <div align="center">
 
-<h1><a id="screenshots"></a>Interface</h1>
+<h2><a id="editor"></a>🖥️ Interfaz</h2>
 
-<img width="1354" height="684" alt="HaxTrace" src="https://github.com/user-attachments/assets/2c9f9605-b655-4ab5-9579-cd231a5791dd" width="50%"/>
-
-<img width="1351" height="685" alt="HaxTrace" src="https://github.com/user-attachments/assets/4419f30e-2434-40db-bae8-45607923f816" width="50%"/>
-
-<img width="1351" height="682" alt="HaxTrace" src="https://github.com/user-attachments/assets/bc1d3e84-ea18-4a74-aa87-a7d7240f7d15" width="50%"/>
+<img width="100%" alt="HaxTrace — vista general del editor" src="https://github.com/user-attachments/assets/93cdec04-09ab-474e-b26b-d8a487612759" />
+<img width="100%" alt="HaxTrace — Smart Guides en acción" src="https://github.com/user-attachments/assets/c2e3932a-72c4-4fa3-a28b-3c4c9b6db775" />
+<img width="100%" alt="HaxTrace — Ayuda y Infon" src="https://github.com/user-attachments/assets/936ada2c-6164-4e5a-8909-14a00fdbadac" />
 
 </div>
 
 ---
 
-<div align="center">
+## 🧠 ¿Qué es HaxTrace?
 
-<h1><a id="features"></a>Features</h1>
+HaxTrace convierte un logo o una imagen de referencia en geometría **nativa de Haxball**: vértices y segmentos reales, renderizados en tiempo real sobre HTML5 Canvas.
+
+> Subís tu logo → trazás con precisión → exportás vértices y segmentos listos para tu `.hbs`.
+
+---
+
+<h2><a id="funciones"></a>✨ Funciones</h2>
 
 <table>
-  <tr>
-</td>
-    <td width="50%" valign="top">
+<tr>
+<td width="50%" valign="top">
 
-### Precision & Assistance
-- **Smart Guides:** Alineación dinámica (X/Y) con resalte en cian.
-- **Mirror Mode:** Simetría real en tiempo real (Vertical/Horizontal).
-- **Vertex Magnetic:** Atrae el cursor a puntos existentes para conexiones perfectas.
-- **Gap Detector:** Localiza vértices sueltos que rompen la colisión física.
-
-</td>
-  </tr>
-  <tr>
-    <td width="50%" valign="top">
-
-### Advanced Interaction
-- **Omni-Selection:** Selección múltiple universal con cuadro de selección (Marquee).
-- **Edit in Bulk:** Cambia propiedades (bouncing, color, vis) de varios segmentos a la vez.
-- **Keyboard Mastery:** Atajos profesionales para un flujo de trabajo sin mouse.
+#### 🎯 Precisión & Asistencia
+- **Smart Guides** — alineación dinámica X/Y con resalte en cian.
+- **Mirror Mode** — simetría real en tiempo real (vertical / horizontal).
+- **Vertex Magnetic** — atrae el cursor a puntos existentes para conexiones perfectas.
+- **Gap Detector** — localiza vértices sueltos que rompen la colisión física.
 
 </td>
-  </tr>
+<td width="50%" valign="top">
+
+#### ⚡ Interacción Avanzada
+- **Omni-Selection** — selección múltiple universal con cuadro de selección (marquee).
+- **Edit in Bulk** — cambiá bouncing, color o visibilidad de varios segmentos a la vez.
+- **Keyboard Mastery** — atajos profesionales para un flujo de trabajo sin mouse.
+
+</td>
+</tr>
 </table>
 
-</div>
+---
+
+<h2><a id="flujo"></a>🔁 Flujo de trabajo</h2>
+
+1. **Subí** tu logo o imagen de referencia al lienzo.
+2. **Trazá** los vértices — Snap-to-Grid y Vertex Magnetic hacen que cada punto encaje solo.
+3. **Alineá** con Smart Guides y activá Mirror Mode si el logo es simétrico.
+4. **Revisá** con Gap Detector antes de exportar — un vértice suelto es una fuga de colisión invisible a simple vista.
+5. **Exportá** la geometría y pegala en `vertexes` / `segments` de tu mapa.
+
+---
+
+<h2><a id="atajos"></a>⌨️ Atajos de teclado</h2>
+
+| Atajo | Acción |
+| :--- | :--- |
+| `Ctrl + Z` | Deshacer |
+| `Ctrl + Shift + Z` | Rehacer |
+| `Delete` / `Backspace` | Eliminar selección |
+| `Esc` | Deseleccionar |
+| `Ctrl + A` | Seleccionar todo |
+
+---
+
+## 🔒 Decisiones de diseño
+
+| Decisión | Riesgo que mitiga |
+| :--- | :--- |
+| Geometría nativa (vértices/segmentos) en vez de rasterizar la imagen | Haxball solo calcula colisión sobre `vertexes`/`segments` — un PNG de fondo no choca con nada. |
+| Gap Detector | Un vértice "casi" pegado a otro genera fugas de colisión que a simple vista parecen una pared cerrada. |
+| Smart Guides en cian | Mismo contraste sobre lienzos claros y oscuros, sin perderse entre el trazo. |
+| Vertex Magnetic | Evita micro-huecos invisibles entre segmentos que deberían compartir un punto exacto. |
+
+---
+
+<h2><a id="faq"></a>❓ FAQ</h2>
+
+**¿Necesito instalar algo?**
+No. HaxTrace corre 100% en el navegador, sin registro ni instalación.
+
+**¿Qué subo como referencia?**
+Cualquier imagen (PNG, JPG, WebP) que quieras vectorizar.
+
+**¿Qué obtengo al exportar?**
+Vértices y segmentos listos para pegar directamente en tu `.hbs`.
+
+**¿Funciona mejor en escritorio o en mobile?**
+Recomendado en escritorio — el trazado de precisión depende de mouse + teclado.
+
+---
+
+## 🗺️ Roadmap
+
+- [x] Smart Guides + Snap-to-Grid
+- [x] Mirror Mode (vertical / horizontal)
+- [x] Vertex Magnetic
+- [x] Gap Detector
+- [x] Omni-Selection (marquee)
+- [x] Atajos de teclado profesionales
+- [ ] Rediseño a la interfaz
+
+---
+
+## ⚠️ Estado
+
+> **Estado del proyecto:** v2.7.0 — editor estable, en uso activo por la comunidad de mappers de Haxball.
 
 ---
 
 <div align="center">
 
-<h1>Contributors</h1>
+## Contribuidores
 
 <a href="https://github.com/mo0negtt/HaxTrace/graphs/contributors">
   <img src="https://contrib.rocks/image?repo=mo0negtt/HaxTrace" alt="Contributors"/>
@@ -84,12 +152,17 @@
 
 ---
 
-<div align="center">
+## 📄 Licencia
 
+MIT
+
+---
+
+<div align="center">
 <br/>
 
 **Hecho con ❤️ por [mo0negtt](https://github.com/mo0negtt)**
 
-**🇵🇸 🇪🇭**
+🇵🇸 🇪🇭
 
 </div>
